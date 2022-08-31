@@ -28,6 +28,9 @@ SERVER_MODE = os.environ.get("SERVER_MODE", default="localhost")
 
 SITE_ID = 1
 
+
+AUTH_USER_MODEL = "account.User"
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -37,6 +40,14 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # library
+    "rest_framework",
+    "rest_framework.authtoken",
+    "drf_yasg",
+    "django_filters",
+    "ckeditor",
+    # app
+    "account.apps.AccountConfig",
 ]
 
 MIDDLEWARE = [
@@ -135,3 +146,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "mediafiles")
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+REST_AUTH_SERIALIZERS = {
+    "TOKEN_SERIALIZER": "path.to.custom.CustomTokenSerializer",
+}
