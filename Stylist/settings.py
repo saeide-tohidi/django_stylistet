@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     "ckeditor",
     "imagekit",
     "account.apps.AccountConfig",
+    "product.apps.ProductConfig",
+    "attribute.apps.AttributeConfig",
 ]
 
 MIDDLEWARE = [
@@ -72,7 +74,7 @@ WSGI_APPLICATION = "Stylist.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
+#
 DATABASES = {
     "default": {
         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
