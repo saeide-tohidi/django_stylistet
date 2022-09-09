@@ -7,8 +7,21 @@ from attribute.models import (
     AssignedProductAttributeValue,
 )
 
-admin.site.register(Attribute)
-admin.site.register(AttributeValue)
+
+class AttributeValueInline(admin.StackedInline):
+    model = AttributeValue
+
+
+class AttributeAdmin(admin.ModelAdmin):
+    model = Attribute
+
+    inlines = [
+        AttributeValueInline,
+    ]
+
+
+admin.site.register(Attribute, AttributeAdmin)
+
 admin.site.register(AssignedProductAttribute)
 admin.site.register(AttributeProduct)
 admin.site.register(AssignedProductAttributeValue)

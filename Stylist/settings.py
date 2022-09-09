@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "django_filters",
     "ckeditor",
     "imagekit",
+    "dashboard.apps.DashboardConfig",
     "account.apps.AccountConfig",
     "product.apps.ProductConfig",
     "attribute.apps.AttributeConfig",
