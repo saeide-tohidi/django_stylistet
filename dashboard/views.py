@@ -2,8 +2,8 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, UpdateView, CreateView, DetailView
 from product.models import Product, ProductType, ProductCategory
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
+from braces.views import StaffuserRequiredMixin
 from attribute.models import (
     Attribute,
     AttributeProduct,
@@ -13,7 +13,7 @@ from attribute.models import (
 )
 
 
-class ProductList(ListView):
+class ProductList(StaffuserRequiredMixin, ListView):
     model = Product
     template_name = "dashboard/product_list.html"
     context_object_name = "products"
@@ -27,7 +27,7 @@ class ProductList(ListView):
         return context
 
 
-class ProductDetail(DetailView):
+class ProductDetail(StaffuserRequiredMixin, DetailView):
     template_name = "dashboard/product_edit.html"
     model = Product
     context_object_name = "product"
@@ -66,7 +66,7 @@ class ProductDetail(DetailView):
         return context
 
 
-class ProductCreate(LoginRequiredMixin, CreateView):
+class ProductCreate(StaffuserRequiredMixin, CreateView):
     model = Product
     fields = [
         "product_type",
@@ -137,7 +137,7 @@ class ProductCreate(LoginRequiredMixin, CreateView):
         return context
 
 
-class ProductEdit(LoginRequiredMixin, UpdateView):
+class ProductEdit(StaffuserRequiredMixin, UpdateView):
     model = Product
     fields = [
         "product_category",

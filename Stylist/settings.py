@@ -23,6 +23,7 @@ AUTH_USER_MODEL = "account.User"
 # Application definition
 
 INSTALLED_APPS = [
+    "grappelli.dashboard",
     "grappelli",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -36,6 +37,8 @@ INSTALLED_APPS = [
     "django_filters",
     "ckeditor",
     "imagekit",
+    "enmerkar",
+    "django_prices",
     "dashboard.apps.DashboardConfig",
     "account.apps.AccountConfig",
     "product.apps.ProductConfig",
@@ -143,3 +146,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REST_AUTH_SERIALIZERS = {
     "TOKEN_SERIALIZER": "path.to.custom.CustomTokenSerializer",
 }
+
+
+GRAPPELLI_INDEX_DASHBOARD = "maindashboard.CustomIndexDashboard"

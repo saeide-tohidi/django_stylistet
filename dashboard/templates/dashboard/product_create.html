@@ -179,9 +179,10 @@
                                             </div>
                                             <div>
                                                 <label class="form-label">Description</label>
-                                                <div id="kt_ecommerce_add_product_description"
-                                                     name="description"
+                                                <div id="kt_docs_quill_basic" name="description"
                                                      class="min-h-200px mb-2"></div>
+                                                <textarea name="description" style="display:none"
+                                                          id="hiddenArea"></textarea>
                                             </div>
                                         </div>
                                         <!--end::Card header-->
@@ -217,7 +218,7 @@
                         <!--end::Tab content-->
                         <div class="d-flex justify-content-end">
                             <!--begin::Button-->
-                            <a href="products.html" id="kt_ecommerce_add_product_cancel"
+                            <a href="#" id="kt_ecommerce_add_product_cancel"
                                class="btn btn-light me-5">Cancel</a>
                             <!--end::Button-->
                             <!--begin::Button-->
@@ -295,6 +296,22 @@
                 $(this).slideUp(deleteElement);
             }
         });
+    </script>
+
+
+    <script>
+        var quill = new Quill('#kt_docs_quill_basic', {
+            modules: {
+                toolbar: true
+            },
+            placeholder: 'Type your text here...',
+            theme: 'snow'
+        });
+
+
+        $("#add_product").on("submit", function () {
+            $("#hiddenArea").val($(".ql-editor ").html());
+        })
     </script>
 
 

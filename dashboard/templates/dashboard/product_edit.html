@@ -37,7 +37,7 @@
             <div id="kt_app_content_container" class="app-container container-xxl">
 
                 <!--begin::Form-->
-                <form id="add_product" class="form d-flex flex-column flex-lg-row"
+                <form id="edit_product" class="form d-flex flex-column flex-lg-row"
                       method="POST" action="{% url 'product_edit'  pk=product.pk %}"
                       enctype="multipart/form-data">
                     {% csrf_token %}
@@ -63,10 +63,10 @@
                                     <!--begin::Label-->
                                     <label class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
                                            data-kt-image-input-action="change" data-bs-toggle="tooltip"
-                                           title="Change avatar">
-                                        <i class="bi bi-pencil-fill fs-7"></i>
+                                           title="Change main product image">
+                                        <i class="fa fa-edit"></i>
                                         <!--begin::Inputs-->
-                                        <input type="file" name="main_image" accept=".png, .jpg, .jpeg"/>
+                                        <input type="file" name="main_image" accept=".png, .jpg, .jpeg" required/>
                                         <!--end::Inputs-->
                                     </label>
                                     <!--end::Label-->
@@ -174,9 +174,11 @@
                                             <div>
                                                 <label class="form-label">Description</label>
                                                 <!--begin::Editor-->
-                                                <div id="kt_ecommerce_add_product_description"
-                                                     name="kt_ecommerce_add_product_description"
-                                                     class="min-h-200px mb-2">{{ product.description }}</div>
+                                                <div id="kt_docs_quill_basic" name="description"
+                                                     class="min-h-200px mb-2">{{ product.description|safe }}</div>
+                                                <textarea name="description" style="display:none"
+                                                          id="hiddenArea"></textarea>
+
                                                 <!--end::Editor-->
                                                 <!--begin::Description-->
                                                 <div class="text-muted fs-7">Set a description to the product for better
@@ -349,7 +351,7 @@
                         <!--end::Tab content-->
                         <div class="d-flex justify-content-end">
                             <!--begin::Button-->
-                            <a href="products.html" id="kt_ecommerce_add_product_cancel"
+                            <a href="#" id="kt_ecommerce_add_product_cancel"
                                class="btn btn-light me-5">Cancel</a>
                             <!--end::Button-->
                             <!--begin::Button-->
@@ -414,21 +416,18 @@
     </script>
 
     <script>
-        $('#kt_docs_repeater_basic').repeater({
-            initEmpty: false,
-
-            defaultValues: {
-                'text-input': 'foo'
+        var quill = new Quill('#kt_docs_quill_basic', {
+            modules: {
+                toolbar: true
             },
-
-            show: function () {
-                $(this).slideDown();
-            },
-
-            hide: function (deleteElement) {
-                $(this).slideUp(deleteElement);
-            }
+            placeholder: 'Type your text here...',
+            theme: 'snow'
         });
+
+
+        $("#edit_product").on("submit", function () {
+            $("#hiddenArea").val($(".ql-editor ").html());
+        })
     </script>
 
 

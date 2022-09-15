@@ -1,8 +1,15 @@
 from django.db import models
 from mptt.managers import TreeManager
 from mptt.models import MPTTModel
-
+from django.utils.translation import gettext_lazy as _
 from seo.models import SeoModel
+from django_prices.models import MoneyField
+from babel.numbers import list_currencies
+
+
+def create_currency():
+    currency_choices = [(currency, currency) for currency in list_currencies()]
+    return sorted(currency_choices, key=lambda x: x[0])
 
 
 class ProductCategory(MPTTModel, SeoModel):
@@ -60,6 +67,12 @@ class Product(SeoModel):
     main_image = models.ImageField(upload_to="products", blank=True, null=True)
     slug = models.SlugField(max_length=255, unique=True, allow_unicode=True, blank=True)
     description = models.TextField(blank=True, null=True)
+    currency = models.CharField(max_length=3, default="USD", choices=create_currency())
+    price_amount = models.DecimalField(
+        _("Price"), max_digits=9, decimal_places=2, default="0"
+    )
+    price = MoneyField(amount_field="price_amount", currency_field="currency")
+    shopping_url = models.CharField(max_length=200, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
 
