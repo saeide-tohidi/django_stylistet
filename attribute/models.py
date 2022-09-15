@@ -5,40 +5,22 @@ from product.models import ProductType, Product
 class AttributeInputType:
     """The type that we expect to render the attribute's values as."""
 
-    DROPDOWN = "dropdown"
+    DROPDOWN = "oneselect"
     MULTISELECT = "multiselect"
-    FILE = "file"
-    NUMERIC = "numeric"
-    PLAIN_TEXT = "plain-text"
     BOOLEAN = "boolean"
 
     CHOICES = [
-        (DROPDOWN, "Dropdown"),
+        (DROPDOWN, "One select"),
         (MULTISELECT, "Multi Select"),
-        (FILE, "File"),
-        (NUMERIC, "Numeric"),
-        (PLAIN_TEXT, "Plain Text"),
         (BOOLEAN, "Boolean"),
     ]
 
     # list of the input types that can be used in variant selection
-    ALLOWED_IN_VARIANT_SELECTION = [DROPDOWN, BOOLEAN, NUMERIC]
+    ALLOWED_IN_VARIANT_SELECTION = [DROPDOWN, BOOLEAN]
 
     TYPES_WITH_CHOICES = [
         DROPDOWN,
         MULTISELECT,
-    ]
-
-    # list of the input types that are unique per instances
-    TYPES_WITH_UNIQUE_VALUES = [
-        FILE,
-        PLAIN_TEXT,
-        NUMERIC,
-    ]
-
-    # list of the translatable attributes, excluding attributes with choices.
-    TRANSLATABLE_ATTRIBUTES = [
-        PLAIN_TEXT,
     ]
 
 
@@ -60,6 +42,10 @@ class BaseAssignedAttribute(models.Model):
 class Attribute(models.Model):
     slug = models.SlugField(max_length=250, unique=True, allow_unicode=True)
     name = models.CharField(max_length=255)
+    image_value = models.BooleanField(
+        default=False,
+        help_text="If values for this attribute have image, select this item.",
+    )
 
     input_type = models.CharField(
         max_length=50,
@@ -76,13 +62,6 @@ class Attribute(models.Model):
     )
 
     value_required = models.BooleanField(default=False, blank=True)
-    visible_in_storefront = models.BooleanField(default=True, blank=True)
-
-    filterable_in_storefront = models.BooleanField(default=False, blank=True)
-    filterable_in_dashboard = models.BooleanField(default=False, blank=True)
-
-    storefront_search_position = models.IntegerField(default=0, blank=True)
-    available_in_grid = models.BooleanField(default=False, blank=True)
 
     class Meta:
         ordering = ("slug",)
@@ -97,21 +76,17 @@ class Attribute(models.Model):
 class AttributeValue(models.Model):
     name = models.CharField(max_length=250)
     picture = models.ImageField(blank=True, null=True)
-
-    # keeps hex code color value in #RRGGBBAA format
-    value = models.CharField(max_length=100, blank=True, default="")
+    value = models.CharField(
+        max_length=100,
+        blank=True,
+        default="",
+        help_text="keeps hex code color value in #RRGGBBAA format",
+    )
     slug = models.SlugField(max_length=255, allow_unicode=True)
-    file_url = models.URLField(null=True, blank=True)
-    content_type = models.CharField(max_length=50, null=True, blank=True)
     attribute = models.ForeignKey(
         "Attribute", related_name="values", on_delete=models.CASCADE
     )
-    plain_text = models.TextField(
-        blank=True,
-        null=True,
-    )
     boolean = models.BooleanField(blank=True, null=True)
-    date_time = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         ordering = ("pk",)
@@ -189,3 +164,6 @@ class AssignedProductAttributeValue(models.Model):
 
     def get_ordering_queryset(self):
         return self.assignment.productvalueassignment.all()
+
+    def __str__(self):
+        return str(self.value)

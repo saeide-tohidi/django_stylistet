@@ -1,6 +1,7 @@
 from django.db import models
 from mptt.managers import TreeManager
 from mptt.models import MPTTModel
+
 from seo.models import SeoModel
 
 
@@ -57,7 +58,7 @@ class Product(SeoModel):
     )
     name = models.CharField(max_length=250)
     main_image = models.ImageField(upload_to="products", blank=True, null=True)
-    slug = models.SlugField(max_length=255, unique=True, allow_unicode=True)
+    slug = models.SlugField(max_length=255, unique=True, allow_unicode=True, blank=True)
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
@@ -68,6 +69,25 @@ class Product(SeoModel):
 
     def __str__(self):
         return self.name
+
+    @property
+    def get_attr_values(self):
+        attributes = self.attributes.all()
+        all_attr_val = []
+        for attr in attributes:
+            vals = []
+            for at in attr.productvalueassignment.all():
+                vals.append([at.value.name, at.value.id])
+            t = f"{attr.attribute.name}: {vals} "
+            all_attr_val.append(t)
+
+        return all_attr_val
+
+    @property
+    def get_values(self):
+        attributes = self.attributes.v
+
+        return attributes
 
 
 class ProductMedia(models.Model):

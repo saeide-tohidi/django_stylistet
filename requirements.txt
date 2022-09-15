@@ -26,3 +26,4 @@ django-mptt==0.13.4
 django-ckeditor==6.1.0
 django-grappelli==3.0.3
 django-imagekit==4.1.0
+shortuuid==1.0.9
