@@ -81,10 +81,10 @@
                                     </div>
                                 </th>
                                 <th class="min-w-200px">Product</th>
-                                <th class="text-end min-w-70px">category</th>
-                                <th class="text-end min-w-70px">Type</th>
-                                <th class="text-end min-w-150px">Price</th>
-                                <th class="text-end min-w-70px">Actions</th>
+                                <th class="text-start min-w-70px">category</th>
+                                <th class="text-start min-w-70px">Type</th>
+                                <th class="text-start min-w-70px">Attribute</th>
+                                <th class="text-start min-w-70px">Actions</th>
                             </tr>
                             <!--end::Table row-->
                             </thead>
@@ -102,7 +102,7 @@
 
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <a href="edit-product.html" class="symbol symbol-50px">
+                                            <a href="#" class="symbol symbol-50px">
                                                             <span class="symbol-label"
                                                                   style="background-image:url({{ product.main_image.url }});"></span>
                                             </a>
@@ -114,22 +114,26 @@
                                         </div>
                                     </td>
 
-                                    <td class="text-end pe-0">
+                                    <td class="text-start pe-0">
                                         <span class="fw-bold">{{ product.product_category.name }}</span>
                                     </td>
 
-                                    <td class="text-end pe-0">
+                                    <td class="text-start pe-0">
                                         <span class="fw-bold">{{ product.product_type.name }}</span>
                                     </td>
 
-                                    <td class="text-end pe-0">
-                                        <span class="fw-bold text-dark">{{product.get_attr_values}}</span>
+                                    <td class="text-start ms-5">
+                                        {% for val in product.get_attr_values %}
+                                            <span class="fw-bold text-right">{{ val }}</span>
+                                            <br>
+
+                                        {% endfor %}
                                     </td>
 
 
                                     <!--begin::Action=-->
-                                    <td class="text-end">
-                                        <a href="products.html#"
+                                    <td class="text-start">
+                                        <a href="#"
                                            class="btn btn-sm btn-light btn-active-light-primary"
                                            data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
                                             <!--begin::Svg Icon | path: icons/duotune/arrows/arr072.svg-->
@@ -146,13 +150,8 @@
                                              data-kt-menu="true">
                                             <!--begin::Menu item-->
                                             <div class="menu-item px-3">
-                                                <a href="{% url 'product_detail' pk=product.pk %}" class="menu-link px-3">Edit</a>
-                                            </div>
-                                            <!--end::Menu item-->
-                                            <!--begin::Menu item-->
-                                            <div class="menu-item px-3">
-                                                <a href="products.html#" class="menu-link px-3"
-                                                   data-kt-ecommerce-product-filter="delete_row">Delete</a>
+                                                <a href="{% url 'product_detail' pk=product.pk %}"
+                                                   class="menu-link px-3">Edit</a>
                                             </div>
                                             <!--end::Menu item-->
                                         </div>
@@ -181,20 +180,20 @@
 {% endblock %}
 
 
-    {% block footer_ref %}
-        <!--begin::Vendors Javascript(used by this page)-->
-<script src="{% static 'admin_dashboard/plugins/custom/datatables/datatables.bundle.js' %}"></script>
+{% block footer_ref %}
+    <!--begin::Vendors Javascript(used by this page)-->
+    <script src="{% static 'admin_dashboard/plugins/custom/datatables/datatables.bundle.js' %}"></script>
 
-<!--end::Vendors Javascript-->
-<!--begin::Custom Javascript(used by this page)-->
-<script src="{% static 'admin_dashboard/js/custom/apps/ecommerce/catalog/products.js' %}"></script>
-<script src="{% static 'admin_dashboard/js/widgets.bundle.js' %}"></script>
-<script src="{% static 'admin_dashboard/js/custom/widgets.js' %}"></script>
-<script src="{% static 'admin_dashboard/js/custom/apps/chat/chat.js' %}"></script>
-<script src="{% static 'admin_dashboard/js/custom/utilities/modals/upgrade-plan.js' %}"></script>
-<script src="{% static 'admin_dashboard/js/custom/utilities/modals/create-app.js' %}"></script>
-<script src="{% static 'admin_dashboard/js/custom/utilities/modals/users-search.js' %}"></script>
-<!--end::Custom Javascript-->
-    {% endblock %}
+    <!--end::Vendors Javascript-->
+    <!--begin::Custom Javascript(used by this page)-->
+    <script src="{% static 'admin_dashboard/js/custom/apps/ecommerce/catalog/products.js' %}"></script>
+    <script src="{% static 'admin_dashboard/js/widgets.bundle.js' %}"></script>
+    <script src="{% static 'admin_dashboard/js/custom/widgets.js' %}"></script>
+    <script src="{% static 'admin_dashboard/js/custom/apps/chat/chat.js' %}"></script>
+    <script src="{% static 'admin_dashboard/js/custom/utilities/modals/upgrade-plan.js' %}"></script>
+    <script src="{% static 'admin_dashboard/js/custom/utilities/modals/create-app.js' %}"></script>
+    <script src="{% static 'admin_dashboard/js/custom/utilities/modals/users-search.js' %}"></script>
+    <!--end::Custom Javascript-->
+{% endblock %}
 
 

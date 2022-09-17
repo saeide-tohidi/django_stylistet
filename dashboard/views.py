@@ -1,7 +1,8 @@
+from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, UpdateView, CreateView, DetailView
-from product.models import Product, ProductType, ProductCategory
+from product.models import Product, ProductType, ProductCategory, create_currency
 from django.db import transaction
 from braces.views import StaffuserRequiredMixin
 from attribute.models import (
@@ -11,6 +12,7 @@ from attribute.models import (
     AssignedProductAttributeValue,
     AttributeValue,
 )
+from babel.numbers import list_currencies
 
 
 class ProductList(StaffuserRequiredMixin, ListView):
@@ -27,7 +29,7 @@ class ProductList(StaffuserRequiredMixin, ListView):
         return context
 
 
-class ProductDetail(StaffuserRequiredMixin, DetailView):
+class ProductDetail(StaffuserRequiredMixin, SuccessMessageMixin, DetailView):
     template_name = "dashboard/product_edit.html"
     model = Product
     context_object_name = "product"
@@ -63,10 +65,11 @@ class ProductDetail(StaffuserRequiredMixin, DetailView):
         context["all_values"] = AssignedProductAttributeValue.objects.filter(
             assignment__product=self.object
         ).values_list("value_id", flat=True)
+        context["currency"] = list_currencies()
         return context
 
 
-class ProductCreate(StaffuserRequiredMixin, CreateView):
+class ProductCreate(StaffuserRequiredMixin, SuccessMessageMixin, CreateView):
     model = Product
     fields = [
         "product_type",
@@ -74,6 +77,9 @@ class ProductCreate(StaffuserRequiredMixin, CreateView):
         "name",
         "main_image",
         "description",
+        "price_amount",
+        "currency",
+        "shopping_url",
     ]
     template_name = "dashboard/product_create.html"
     success_url = reverse_lazy("product_list")
@@ -134,20 +140,24 @@ class ProductCreate(StaffuserRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         context["product_type"] = ProductType.objects.all()
         context["product_category"] = ProductCategory.objects.all()
+        context["currency"] = list_currencies()
         return context
 
 
-class ProductEdit(StaffuserRequiredMixin, UpdateView):
+class ProductEdit(StaffuserRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Product
     fields = [
         "product_category",
         "name",
         "main_image",
         "description",
+        "price_amount",
+        "currency",
+        "shopping_url",
     ]
     template_name = "dashboard/product_edit.html"
     success_url = reverse_lazy("product_list")
-    success_message = "Your product create successfully"
+    success_message = "Your product updated successfully"
     pk_url_kwarg = "pk"
     query_pk_and_slug = True
 
@@ -321,11 +331,11 @@ class ProductEdit(StaffuserRequiredMixin, UpdateView):
         context["all_values"] = AssignedProductAttributeValue.objects.filter(
             assignment__product=self.object
         ).values_list("value_id", flat=True)
+        context["currency"] = list_currencies()
         return context
 
 
 def load_product_type_attribute_input(request):
-
     if "product_type_id" in request.GET:
         product_type_id = request.GET.get("product_type_id")
         attributes = Attribute.objects.filter(product_types=product_type_id)

@@ -137,7 +137,6 @@
                                 </div>
                             </div>
                             <div class="card-body pt-0">
-                                <label class="form-label">Categories</label>
                                 <select class="form-select mb-2" data-control="select2"
                                         data-placeholder="Select an option" required name="product_category"
                                         data-allow-clear="true">
@@ -161,8 +160,6 @@
                             <div class="tab-pane fade show active" id="kt_ecommerce_add_product_general"
                                  role="tab-panel">
                                 <div class="d-flex flex-column gap-7 gap-lg-10">
-
-
                                     <!--begin::General options-->
                                     <div class="card card-flush py-4">
                                         <div class="card-header">
@@ -176,6 +173,33 @@
                                                 <label class="required form-label">Name</label>
                                                 <input type="text" name="name" class="form-control mb-2"
                                                        placeholder="Product name" value="" required/>
+                                            </div>
+                                            <div class="d-flex flex-wrap gap-5 mb-10 ">
+                                                <div class="fv-row w-100 flex-md-root">
+                                                    <label class="required form-label">Price</label>
+                                                    <input type="text" class="form-control mb-2" name="price_amount"
+                                                           value=""/>
+                                                </div>
+                                                <div class="fv-row w-100 flex-md-root">
+                                                    <label class="form-label">Currency</label>
+                                                    <select class="form-select mb-2" data-control="select2" ff
+                                                            data-hide-search="true" data-placeholder="Select an option"
+                                                            name="currency">
+                                                        {% for cur in currency %}
+                                                            <option value="{{ cur }}" {% if cur == 'AED' %}
+                                                                    selected {% endif %}>{{ cur }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <label for="basic-url" class="form-label">Product url</label>
+                                            <div class="input-group mb-10">
+                                                <span class="input-group-text" id="basic-addon3">
+                                                    <i class="las la-link fs-1"></i>
+                                                </span>
+                                                <input type="text" class="form-control" id="basic-url" name="shopping_url"
+                                                       placeholder="Website URL" aria-describedby="basic-addon3"/>
                                             </div>
                                             <div>
                                                 <label class="form-label">Description</label>

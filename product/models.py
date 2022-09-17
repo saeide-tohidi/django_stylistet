@@ -67,7 +67,7 @@ class Product(SeoModel):
     main_image = models.ImageField(upload_to="products", blank=True, null=True)
     slug = models.SlugField(max_length=255, unique=True, allow_unicode=True, blank=True)
     description = models.TextField(blank=True, null=True)
-    currency = models.CharField(max_length=3, default="USD", choices=create_currency())
+    currency = models.CharField(max_length=3, default="AED", choices=create_currency())
     price_amount = models.DecimalField(
         _("Price"), max_digits=9, decimal_places=2, default="0"
     )
@@ -87,12 +87,17 @@ class Product(SeoModel):
     def get_attr_values(self):
         attributes = self.attributes.all()
         all_attr_val = []
+        all_attr_val_str = ""
+
         for attr in attributes:
-            vals = []
+            values = []
+            values_str = ""
             for at in attr.productvalueassignment.all():
-                vals.append([at.value.name, at.value.id])
-            t = f"{attr.attribute.name}: {vals} "
+                values.append([at.value.name])
+                values_str = f"{values_str} {at.value.name},"
+            t = f"{attr.attribute.name}: {values_str} "
             all_attr_val.append(t)
+            all_attr_val_str = f"{all_attr_val_str}{t} _ "
 
         return all_attr_val
 
