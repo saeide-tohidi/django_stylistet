@@ -1,0 +1,9 @@
+{% load static %}
+
+<!--begin::Javascript-->
+<script>var hostUrl = "{% static 'admin_dashboard/' %}";</script>
+<!--begin::Global Javascript Bundle(used by all pages)-->
+<script src="{% static 'admin_dashboard/plugins/global/plugins.bundle.js' %}"></script>
+<script src="{% static 'admin_dashboard/js/scripts.bundle.js' %}"></script>
+<!--end::Global Javascript Bundle-->
+<!--end::Javascript-->

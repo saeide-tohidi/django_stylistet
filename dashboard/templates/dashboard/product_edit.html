@@ -1,0 +1,480 @@
+{% extends 'dashboard/shared/base.html' %}
+{% load static %}
+
+{% block header_ref %}
+
+
+    <link href="{% static 'admin_dashboard/plugins/global/plugins.bundle.css' %}" rel="stylesheet" type="text/css"/>
+    <script src="{% static 'admin_dashboard/plugins/global/plugins.bundle.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+    <!--begin::Content wrapper-->
+    <div class="d-flex flex-column flex-column-fluid">
+        <!--begin::Toolbar-->
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <!--begin::Toolbar container-->
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <!--begin::Page title-->
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <!--begin::Title-->
+                    <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">
+                        Product
+                        Form</h1>
+                    <!--end::Title-->
+                </div>
+                <!--end::Page title-->
+            </div>
+            <!--end::Toolbar container-->
+        </div>
+        <!--end::Toolbar-->
+
+
+        <!--begin::Content-->
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <!--begin::Content container-->
+            <div id="kt_app_content_container" class="app-container container-xxl">
+
+                <!--begin::Form-->
+                <form id="edit_product" class="form d-flex flex-column flex-lg-row"
+                      method="POST" action="{% url 'product_edit'  pk=product.pk %}"
+                      enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <!--begin::Aside column-->
+                    <div class="d-flex flex-column gap-7 gap-lg-10 w-100 w-lg-300px mb-7 me-lg-10">
+                        <!--begin::main image settings-->
+                        <div class="card card-flush py-4">
+                            <div class="card-header">
+                                <div class="card-title required">
+                                    <h2>Main image</h2>
+                                </div>
+                            </div>
+                            <!--begin::Card body-->
+                            <div class="card-body text-center pt-0">
+
+                                <div class="image-input image-input-empty image-input-outline image-input-placeholder mb-3"
+                                     data-kt-image-input="true">
+                                    <!--begin::Preview existing avatar-->
+                                    <div class="image-input-wrapper w-150px h-150px"
+                                         style="background-image: url({{ product.main_image.url }})"></div>
+                                    <!--end::Preview existing avatar-->
+
+                                    <!--begin::Label-->
+                                    <label class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
+                                           data-kt-image-input-action="change" data-bs-toggle="tooltip"
+                                           title="Change main product image">
+                                        <i class="fa fa-edit"></i>
+                                        <!--begin::Inputs-->
+                                        <input type="file" name="main_image" accept=".png, .jpg, .jpeg"/>
+                                        <!--end::Inputs-->
+                                    </label>
+                                    <!--end::Label-->
+                                    <!--begin::Cancel-->
+                                    <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
+                                          data-kt-image-input-action="cancel" data-bs-toggle="tooltip"
+                                          title="Cancel avatar">
+															<i class="fa fa-edit"></i>
+														</span>
+                                    <!--end::Cancel-->
+                                    <!--begin::Remove-->
+                                    <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
+                                          data-kt-image-input-action="remove" data-bs-toggle="tooltip"
+                                          title="Remove avatar">
+															<i class="fa fa-remove"></i>
+														</span>
+                                    <!--end::Remove-->
+                                </div>
+
+                                <!--begin::Description-->
+                                <div class="text-muted fs-7">Set the product main image. Only *.png, *.jpg and
+                                    *.jpeg
+                                    image files are accepted
+                                </div>
+                                <!--end::Description-->
+                            </div>
+                            <!--end::Card body-->
+                        </div>
+                        <!--end::main image settings-->
+
+                        <!--begin::Product type-->
+                        <div class="card card-flush py-4">
+                            <div class="card-header">
+                                <div class="card-title required">
+                                    <h2>Product type</h2>
+                                </div>
+                            </div>
+                            <div class="card-body pt-0">
+                                <select class="form-select mb-2" data-control="select2" data-hide-search="true"
+                                        name="product_type" required
+                                        data-placeholder="Select an option" id="product_type">
+                                    <option></option>
+                                    {% for type in product_type %}
+                                        <option value="{{ type.id }}" {% if product.product_type.id == type.id %}
+                                                selected {% endif %}>{{ type.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="text-muted fs-7">You should choose product type to see other product
+                                    attributes.
+                                </div>
+                            </div>
+                        </div>
+                        <!--end::Product type-->
+
+
+                        <!--begin::Category & tags-->
+                        <div class="card card-flush py-4">
+                            <div class="card-header">
+                                <div class="card-title required">
+                                    <h2>Product Category</h2>
+                                </div>
+                            </div>
+                            <div class="card-body pt-0">
+                                <select class="form-select mb-2" data-control="select2"
+                                        data-placeholder="Select an option" required name="product_category"
+                                        data-allow-clear="true">
+                                    <option></option>
+                                    {% for cat in product_category %}
+                                        <option value="{{ cat.id }}" {% if product.product_category.id == cat.id %}
+                                                selected {% endif %}>{{ cat.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <!--end::Category & tags-->
+                    </div>
+                    <!--end::Aside column-->
+
+                    <!--begin::Main column-->
+                    <div class="d-flex flex-column flex-row-fluid gap-7 gap-lg-10">
+
+                        <!--begin::Tab content-->
+                        <div class="tab-content">
+                            <!--begin::Tab pane-->
+                            <div class="tab-pane fade show active" id="kt_ecommerce_add_product_general"
+                                 role="tab-panel">
+                                <div class="d-flex flex-column gap-7 gap-lg-10">
+
+
+                                    <!--begin::General options-->
+                                    <div class="card card-flush py-4">
+                                        <div class="card-header">
+                                            <div class="card-title">
+                                                <h2>General info</h2>
+                                            </div>
+                                        </div>
+                                        <!--begin::Card body-->
+                                        <div class="card-body pt-0">
+                                            <div class="mb-10 fv-row">
+                                                <label class="required form-label">Name</label>
+                                                <input type="text" name="name" class="form-control mb-2"
+                                                       placeholder="Product name" value="{{ product.name }}" required/>
+                                            </div>
+                                            <div class="d-flex flex-wrap gap-5 mb-10 ">
+                                                <div class="fv-row w-100 flex-md-root">
+                                                    <label class="required form-label">Price</label>
+                                                    <input type="text" class="form-control mb-2" name="price_amount"
+                                                           value="{{ product.price_amount }}"/>
+                                                </div>
+                                                <div class="fv-row w-100 flex-md-root">
+                                                    <label class="form-label">Currency</label>
+                                                    <select class="form-select mb-2" data-control="select2" ff
+                                                            data-hide-search="true" data-placeholder="Select an option"
+                                                            name="currency">
+                                                        {% for cur in currency %}
+                                                            <option value="{{ cur }}" {% if cur == product.currency %}
+                                                                    selected {% endif %}>{{ cur }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <label for="basic-url" class="form-label">Product url</label>
+                                            <div class="input-group mb-10">
+                                                <span class="input-group-text" id="basic-addon3">
+                                                    <i class="las la-link fs-1"></i>
+                                                </span>
+                                                <input type="text" class="form-control" id="basic-url"
+                                                       name="shopping_url" value="
+                                                        {% if product.shopping_url %}{{ product.shopping_url }}{% endif %}"
+                                                       placeholder="Website URL" aria-describedby="basic-addon3"/>
+                                            </div>
+                                            <div>
+                                                <label class="form-label">Description</label>
+                                                <!--begin::Editor-->
+                                                <div id="kt_docs_quill_basic" name="description"
+                                                     class="min-h-200px mb-2">{{ product.description|safe }}</div>
+                                                <textarea name="description" style="display:none"
+                                                          id="hiddenArea"></textarea>
+
+                                                <!--end::Editor-->
+                                                <!--begin::Description-->
+                                                <div class="text-muted fs-7">Set a description to the product for better
+                                                    visibility.
+                                                </div>
+                                                <!--end::Description-->
+                                            </div>
+                                        </div>
+                                        <!--end::Card header-->
+                                    </div>
+                                    <!--end::General options-->
+
+
+                                    <!--begin::Attributes-->
+                                    <div class="card card-flush py-4">
+                                        <!--begin::Card header-->
+                                        <div class="card-header">
+                                            <div class="card-title">
+                                                <h2>Attributes</h2>
+                                            </div>
+                                        </div>
+                                        <!--end::Card header-->
+                                        <!--begin::attributes-->
+                                        <div id="attributes">
+                                            <div class="card-body pt-0">
+
+                                                {% for attr in booleans %}
+
+                                                    <div class="mb-10">
+                                                        <div class="mb-1 fv-row">
+                                                            <label class="form-label">{{ attr.name }}</label>
+                                                        </div>
+                                                        <div class="form-check form-switch form-check-custom form-check-solid">
+                                                            {% for val in attr.values.all %}
+                                                                {% if val.boolean == True %}
+                                                                    <input class="form-check-input" type="checkbox"
+                                                                           name="{{ attr.slug }}" value="{{ val.id }}"
+                                                                           id="{{ attr.name }}"
+                                                                            {% if val.id in all_values %}
+                                                                           checked {% endif %}/>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+
+                                                {% endfor %}
+
+                                                {% for attr in oneselect_no_pic %}
+
+                                                    <div class="mb-10 fv-row">
+                                                        <label class="form-label {% if attr.value_required %} required {% endif %}">{{ attr.name }}</label>
+                                                        <select class="form-select mb-2" data-control="select2"
+                                                                data-hide-search="true"
+                                                                name="{{ attr.slug }}" {% if attr.value_required %}
+                                                                required {% endif %}
+                                                                data-placeholder="Select an option"
+                                                                id="{{ attr.name }}">
+                                                            <option></option>
+                                                            {% for val in attr.values.all %}
+                                                                <option value="{{ val.id }}"
+                                                                        {% if val.id in all_values %}
+                                                                        selected {% endif %}>{{ val.name }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+
+                                                {% endfor %}
+
+                                                {% for attr in multiselect_no_pic %}
+
+                                                    <div class="mb-10">
+                                                        <div class="mb-1 fv-row">
+                                                            <label class="{% if attr.value_required %} required {% endif %} form-label">{{ attr.name }}</label>
+                                                        </div>
+                                                        {% for val in attr.values.all %}
+                                                            <div class="form-check form-check-inline ">
+                                                                <input class="form-check-input" type="checkbox"
+                                                                       name="{{ attr.slug }}" value="{{ val.id }}"
+                                                                       id="{{ attr.name }}"
+                                                                        {% if val.id in all_values %}
+                                                                       checked {% endif %}/>
+                                                                <label class="form-check-label" for="{{ attr.name }}">
+                                                                    {{ val.name }}
+                                                                </label>
+                                                            </div>
+                                                        {% endfor %}
+                                                    </div>
+
+                                                {% endfor %}
+
+                                                {% for attr in oneselect_with_pic %}
+
+                                                    <div class="row mw-500px mb-5" data-kt-buttons="true"
+                                                         data-kt-buttons-target=".form-check-image, .form-check-input">
+                                                        <label class="{% if attr.value_required %} required {% endif %} form-label">{{ attr.name }}</label>
+
+                                                        {% for val in attr.values.all %}
+                                                            <div class="col-4">
+                                                                <label class="form-check-clip text-center {% if attr.value_required %} required {% endif %}">
+                                                                    <input class="btn-check" type="radio"
+                                                                           value="{{ val.id }}" name="{{ attr.slug }}"
+                                                                            {% if val.id in all_values %}
+                                                                           checked {% endif %}/>
+                                                                    <div class="form-check-wrapper">
+                                                                        <div class="form-check-indicator"></div>
+                                                                        <img class="form-check-content w-150px h-150px"
+                                                                             src="{{ val.picture.url }}"/>
+                                                                    </div>
+                                                                    <div class="form-check-label">
+                                                                        {{ val.name }}
+                                                                    </div>
+                                                                </label>
+                                                            </div>
+                                                        {% endfor %}
+                                                    </div>
+
+                                                {% endfor %}
+
+                                                {% for attr in multiselect_with_pic %}
+
+                                                    <div class="row mw-500px mb-5">
+                                                        <label class="{% if attr.value_required %} required {% endif %} form-label">{{ attr.name }}</label>
+                                                        {% for val in attr.values.all %}
+                                                            <!--begin::Col-->
+                                                            <div class="col-4">
+                                                                <label class="form-check-clip text-center">
+                                                                    <input class="btn-check" type="checkbox"
+                                                                           value="{{ val.id }}" name="{{ attr.slug }}"
+                                                                            {% if val.id in all_values %}
+                                                                           checked {% endif %}/>
+                                                                    <div class="form-check-wrapper">
+                                                                        <div class="form-check-indicator"></div>
+                                                                        <img class="form-check-content w-150px h-150px"
+                                                                             src="{{ val.picture.url }}"/>
+                                                                    </div>
+
+                                                                    <div class="form-check-label">
+                                                                        {{ val.name }}
+                                                                    </div>
+                                                                </label>
+                                                            </div>
+                                                            <!--end::Col-->
+                                                        {% endfor %}
+
+                                                    </div>
+
+                                                {% endfor %}
+
+                                            </div>
+
+                                        </div>
+                                        <!--end::attributes-->
+
+
+                                    </div>
+                                    <!--end::Attributes-->
+
+                                </div>
+                            </div>
+                            <!--end::Tab pane-->
+
+                        </div>
+                        <!--end::Tab content-->
+                        <div class="d-flex justify-content-end">
+                            <!--begin::Button-->
+                            <a href="#" id="kt_ecommerce_add_product_cancel"
+                               class="btn btn-light me-5">Cancel</a>
+                            <!--end::Button-->
+                            <!--begin::Button-->
+                            <button type="submit" id="kt_ecommerce_add_product_submit" class="btn btn-primary">
+                                <span class="indicator-label">Save Changes</span>
+                                <span class="indicator-progress">Please wait...
+													<span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+                            </button>
+                            <!--end::Button-->
+                        </div>
+                    </div>
+                    <!--end::Main column-->
+                </form>
+                <!--end::Form-->
+            </div>
+            <!--end::Content container-->
+        </div>
+        <!--end::Content-->
+    </div>
+    <!--end::Content wrapper-->
+
+    {% if messages %}
+        {% for message in messages %}
+
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            ...
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>        {% endfor %}
+    {% endif %}
+
+
+{% endblock %}
+
+
+
+{% block footer_ref %}
+    <!--begin::Vendors Javascript(used by this page)-->
+    <script src="{% static 'admin_dashboard/plugins/custom/datatables/datatables.bundle.js' %}"></script>
+    <script src="{% static 'admin_dashboard/plugins/custom/formrepeater/formrepeater.bundle.js' %}"></script>
+
+    <!--end::Vendors Javascript-->
+    <!--begin::Custom Javascript(used by this page)-->
+    <script src="{% static 'admin_dashboard/js/custom/apps/ecommerce/catalog/save-product.js' %}"></script>
+    <script src="{% static 'admin_dashboard/js/widgets.bundle.js' %}"></script>
+    <script src="{% static 'admin_dashboard/js/custom/widgets.js' %}"></script>
+    <script src="{% static 'admin_dashboard/js/custom/utilities/modals/upgrade-plan.js' %}"></script>
+    <script src="{% static 'admin_dashboard/js/custom/utilities/modals/create-app.js' %}"></script>
+    <script src="{% static 'admin_dashboard/js/custom/utilities/modals/users-search.js' %}"></script>
+    <!--end::Custom Javascript-->
+
+    <script>
+
+        $("#product_type").change(function () {
+            var url = '{% url 'ajax_load_product_type_attr_input' %}';
+            var product_type_id = $(this).val();
+            var product_id = '{{ product.id }}'
+
+            $.ajax({
+                url: url,
+                data: {
+                    'product_type_id': product_type_id,
+                    'product_id': product_id
+                },
+                success: function (data) {
+                    $("#attributes").html(data);
+
+                }
+
+            });
+
+        });
+
+    </script>
+
+    <script>
+        var quill = new Quill('#kt_docs_quill_basic', {
+            modules: {
+                toolbar: true
+            },
+            placeholder: 'Type your text here...',
+            theme: 'snow'
+        });
+
+
+        $("#edit_product").on("submit", function () {
+            $("#hiddenArea").val($(".ql-editor ").html());
+        })
+    </script>
+
+
+{% endblock %}

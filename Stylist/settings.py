@@ -23,6 +23,7 @@ AUTH_USER_MODEL = "account.User"
 # Application definition
 
 INSTALLED_APPS = [
+    "grappelli.dashboard",
     "grappelli",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -36,7 +37,12 @@ INSTALLED_APPS = [
     "django_filters",
     "ckeditor",
     "imagekit",
+    "enmerkar",
+    "django_prices",
+    "dashboard.apps.DashboardConfig",
     "account.apps.AccountConfig",
+    "product.apps.ProductConfig",
+    "attribute.apps.AttributeConfig",
 ]
 
 MIDDLEWARE = [
@@ -72,7 +78,7 @@ WSGI_APPLICATION = "Stylist.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
+#
 DATABASES = {
     "default": {
         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
@@ -140,3 +146,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REST_AUTH_SERIALIZERS = {
     "TOKEN_SERIALIZER": "path.to.custom.CustomTokenSerializer",
 }
+
+
+GRAPPELLI_INDEX_DASHBOARD = "maindashboard.CustomIndexDashboard"
