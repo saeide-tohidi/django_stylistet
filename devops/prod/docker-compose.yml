@@ -31,7 +31,7 @@ services:
       - static_volume:/home/app/web/staticfiles
       - media_volume:/home/app/web/mediafiles
     ports:
-      - 80:80
+      - 80:81
     restart: always
     depends_on:
       - web
