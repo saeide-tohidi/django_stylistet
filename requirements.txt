@@ -32,5 +32,7 @@ Babel==2.10.3
 django_prices==2.3.0
 enmerkar==0.7.1
 prices==1.1.0
+gunicorn==20.0.4
+
 
 
