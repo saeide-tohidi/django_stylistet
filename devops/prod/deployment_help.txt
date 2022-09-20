@@ -2,7 +2,7 @@ Reminder:
     - It's better to do this proccess at night 
 
 1. Bring down the dockers
-docker-compose -f docker-compose.prod.yml down
+docker-compose -f devops/prod/docker-compose.yml down
 Reminder:
     - Check the build and run proccess in local before bringing down the server
     - Check the migrate process in local before doing it in here
@@ -10,22 +10,22 @@ Reminder:
     - Backup database every time that you want to bring down the dockers
 
 2. Build and run the dockers
-docker-compose -f docker-compose.prod.yml up -d --build
+docker-compose -f devops/prod/docker-compose.yml up -d --build
 Reminder:
     - Check this in your local before doing it here
 
 3. Migrating changes:
-docker-compose -f docker-compose.prod.yml exec web python manage.py migrate --noinput
+docker-compose -f devops/prod/docker-compose.yml exec web python manage.py migrate --noinput
 Reminder:
     - check this in local before doing it here
 
 4. Collect static files in one place:
-docker-compose -f docker-compose.prod.yml exec web python manage.py collectstatic --no-input --clear
+docker-compose -f devops/prod/docker-compose.yml exec web python manage.py collectstatic --no-input --clear
 Reminder:
     -
 
 5. Adding a superuser - ONLY IF NEEDED
-docker-compose -f docker-compose.prod.yml exec web python manage.py  createsuperuser
+docker-compose -f devops/prod/docker-compose.yml exec web python manage.py  createsuperuser
 Reminder:
     - Do this only when thy are needed
 
