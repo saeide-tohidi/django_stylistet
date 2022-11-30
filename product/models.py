@@ -1,6 +1,8 @@
+from django.core.validators import MaxLengthValidator
 from django.db import models
+from django.utils.text import slugify
 from mptt.managers import TreeManager
-from mptt.models import MPTTModel
+from mptt.models import MPTTModel, TreeForeignKey
 from django.utils.translation import gettext_lazy as _
 from seo.models import SeoModel
 from django_prices.models import MoneyField
@@ -12,28 +14,42 @@ def create_currency():
     return sorted(currency_choices, key=lambda x: x[0])
 
 
-class ProductCategory(MPTTModel, SeoModel):
+class ProductCategory(MPTTModel):
     name = models.CharField(max_length=250)
-    slug = models.SlugField(max_length=255, unique=True, allow_unicode=True)
+    slug = models.SlugField(max_length=255, unique=True, allow_unicode=True, blank=True)
     description = models.TextField(blank=True, null=True)
-    parent = models.ForeignKey(
-        "self", null=True, blank=True, related_name="children", on_delete=models.CASCADE
+    parent = TreeForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        related_name="children",
+        on_delete=models.CASCADE,
+        verbose_name=_("Parent"),
     )
     background_image = models.ImageField(
         upload_to="category-backgrounds", blank=True, null=True
     )
     background_image_alt = models.CharField(max_length=128, blank=True)
 
-    objects = models.Manager()
-    tree = TreeManager()
+    seo_title = models.CharField(
+        max_length=70, blank=True, null=True, validators=[MaxLengthValidator(70)]
+    )
+    seo_description = models.CharField(
+        max_length=300, blank=True, null=True, validators=[MaxLengthValidator(300)]
+    )
 
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        lower_name = self.name.lower()
+        self.slug = slugify(lower_name)
+        super(ProductCategory, self).save(*args, **kwargs)
+
 
 class ProductType(models.Model):
     name = models.CharField(max_length=250)
-    slug = models.SlugField(max_length=255, unique=True, allow_unicode=True)
+    slug = models.SlugField(max_length=255, unique=True, allow_unicode=True, blank=True)
 
     class Meta:
         ordering = ("slug",)
@@ -41,6 +57,11 @@ class ProductType(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        lower_name = self.name.lower()
+        self.slug = slugify(lower_name)
+        super(ProductType, self).save(*args, **kwargs)
 
     def __repr__(self) -> str:
         class_ = type(self)

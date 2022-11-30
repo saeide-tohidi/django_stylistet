@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils.text import slugify
+
 from product.models import ProductType, Product
 
 
@@ -40,7 +42,7 @@ class BaseAssignedAttribute(models.Model):
 
 
 class Attribute(models.Model):
-    slug = models.SlugField(max_length=250, unique=True, allow_unicode=True)
+    slug = models.SlugField(max_length=250, unique=True, allow_unicode=True, blank=True)
     name = models.CharField(max_length=255)
     image_value = models.BooleanField(
         default=False,
@@ -69,6 +71,11 @@ class Attribute(models.Model):
     def __str__(self) -> str:
         return self.name
 
+    def save(self, *args, **kwargs):
+        lower_name = self.name.lower()
+        self.slug = slugify(lower_name)
+        super(Attribute, self).save(*args, **kwargs)
+
     def has_values(self) -> bool:
         return self.values.exists()
 
@@ -82,7 +89,7 @@ class AttributeValue(models.Model):
         default="",
         help_text="keeps hex code color value in #RRGGBBAA format",
     )
-    slug = models.SlugField(max_length=255, allow_unicode=True)
+    slug = models.SlugField(max_length=255, allow_unicode=True, blank=True)
     attribute = models.ForeignKey(
         "Attribute", related_name="values", on_delete=models.CASCADE
     )
@@ -94,6 +101,12 @@ class AttributeValue(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+    def save(self, *args, **kwargs):
+        lower_name = self.name.lower()
+        self.value = lower_name
+        self.slug = slugify(lower_name)
+        super(AttributeValue, self).save(*args, **kwargs)
 
     @property
     def input_type(self):
@@ -137,6 +150,9 @@ class AttributeProduct(models.Model):
         through_fields=("assignment", "product"),
         related_name="attributesrelated",
     )
+
+    def __str__(self):
+        return "___" + self.attribute.name
 
     class Meta:
         unique_together = (("attribute", "product_type"),)
