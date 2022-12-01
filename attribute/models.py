@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
-
+import pathlib
 from product.models import ProductType, Product
 
 
@@ -81,7 +81,7 @@ class Attribute(models.Model):
 
 
 class AttributeValue(models.Model):
-    name = models.CharField(max_length=250)
+    name = models.CharField(max_length=250, blank=True)
     picture = models.ImageField(blank=True, null=True)
     value = models.CharField(
         max_length=100,
@@ -103,8 +103,20 @@ class AttributeValue(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        lower_name = self.name.lower()
-        self.value = lower_name
+        pic_name = str(self.picture)
+        pic_suffix = pathlib.Path(pic_name).suffix
+        name = (
+            pic_name.replace(pic_suffix, "")
+            .replace(".", " ")
+            .replace("-", " ")
+            .replace("_", " ")
+        )
+        if self.name:
+            lower_name = self.name.lower()
+        else:
+            self.name = name
+            lower_name = self.name.lower()
+        self.value = slugify(lower_name)
         self.slug = slugify(lower_name)
         super(AttributeValue, self).save(*args, **kwargs)
 
