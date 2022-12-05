@@ -2,6 +2,15 @@ from django.db import models
 from django.utils.text import slugify
 import pathlib
 from product.models import ProductType, Product
+from django.utils.crypto import get_random_string
+
+
+def unique_slugify(instance, slug):
+    model = instance.__class__
+    unique_slug = slugify(slug)
+    while model.objects.filter(slug=unique_slug).exists():
+        unique_slug = slug + "-" + get_random_string(length=4)
+    return unique_slug
 
 
 class AttributeInputType:
@@ -72,8 +81,9 @@ class Attribute(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        lower_name = self.name.lower()
-        self.slug = slugify(lower_name)
+        if not self.name:
+            lower_name = self.name.lower()
+            self.slug = unique_slugify(self, lower_name)
         super(Attribute, self).save(*args, **kwargs)
 
     def has_values(self) -> bool:
@@ -103,21 +113,24 @@ class AttributeValue(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        pic_name = str(self.picture)
-        pic_suffix = pathlib.Path(pic_name).suffix
-        name = (
-            pic_name.replace(pic_suffix, "")
-            .replace(".", " ")
-            .replace("-", " ")
-            .replace("_", " ")
-        )
-        if self.name:
-            lower_name = self.name.lower()
-        else:
+        if not self.name:
+            pic_name = str(self.picture)
+            pic_suffix = pathlib.Path(pic_name).suffix
+            name = (
+                pic_name.replace(pic_suffix, "")
+                .replace(".", " ")
+                .replace("-", " ")
+                .replace("_", " ")
+            )
             self.name = name
-            lower_name = self.name.lower()
-        self.value = slugify(lower_name)
-        self.slug = slugify(lower_name)
+        lower_name = self.name.lower()
+
+        if not self.slug:
+            self.slug = unique_slugify(self, lower_name)
+
+        if not self.value:
+            self.value = self.slug
+
         super(AttributeValue, self).save(*args, **kwargs)
 
     @property

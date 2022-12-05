@@ -4,6 +4,8 @@ from django.utils.text import slugify
 from mptt.managers import TreeManager
 from mptt.models import MPTTModel, TreeForeignKey
 from django.utils.translation import gettext_lazy as _
+
+from attribute.models import unique_slugify
 from seo.models import SeoModel
 from django_prices.models import MoneyField
 from babel.numbers import list_currencies
@@ -42,8 +44,9 @@ class ProductCategory(MPTTModel):
         return self.name
 
     def save(self, *args, **kwargs):
-        lower_name = self.name.lower()
-        self.slug = slugify(lower_name)
+        if not self.slug:
+            lower_name = self.name.lower()
+            self.slug = unique_slugify(self, lower_name)
         super(ProductCategory, self).save(*args, **kwargs)
 
 
@@ -59,8 +62,9 @@ class ProductType(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        lower_name = self.name.lower()
-        self.slug = slugify(lower_name)
+        if not self.slug:
+            lower_name = self.name.lower()
+            self.slug = unique_slugify(self, lower_name)
         super(ProductType, self).save(*args, **kwargs)
 
     def __repr__(self) -> str:
