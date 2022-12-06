@@ -1,4 +1,5 @@
 from django.contrib import admin
+from import_export.admin import ImportExportModelAdmin
 from mptt.admin import DraggableMPTTAdmin
 from attribute.models import AssignedProductAttribute, AttributeProduct
 from product.models import ProductCategory, ProductMedia, ProductType, Product
@@ -12,7 +13,7 @@ class ProductMediaInline(admin.StackedInline):
     model = ProductMedia
 
 
-class ProductAdmin(admin.ModelAdmin):
+class ProductAdmin(ImportExportModelAdmin):
     model = Product
 
     inlines = [
@@ -20,7 +21,7 @@ class ProductAdmin(admin.ModelAdmin):
     ]
 
 
-class ProductTypeAdmin(admin.ModelAdmin):
+class ProductTypeAdmin(ImportExportModelAdmin):
     model = ProductType
     list_display = ["name", "get_attribute_product"]
     readonly_fields = ["slug", "get_attribute_product"]
@@ -38,13 +39,13 @@ class ProductTypeAdmin(admin.ModelAdmin):
     get_attribute_product.short_description = "All attributes"
 
 
-class ProductCategoryAdmin(DraggableMPTTAdmin):
+class ProductCategoryAdmin(DraggableMPTTAdmin, ImportExportModelAdmin):
     mptt_indent_field = "name"
     expand_tree_by_default = True
     MPTT_ADMIN_LEVEL_INDENT = 50
 
 
-admin.site.register(ProductMedia)
+admin.site.register(ProductMedia, ImportExportModelAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductType, ProductTypeAdmin)
 admin.site.register(ProductCategory, ProductCategoryAdmin)

@@ -50,6 +50,7 @@ class CustomIndexDashboard(Dashboard):
                 column=1,
                 models=(
                     "attribute.models.Attribute",
+                    "attribute.models.AttributeValue",
                     "product.models.ProductType",
                     "product.models.ProductCategory",
                     "product.models.ProductMedia",
@@ -65,20 +66,32 @@ class CustomIndexDashboard(Dashboard):
             )
         )
         self.children.append(
+            modules.ModelList(
+                title="Backup",
+                column=1,
+                models=("backupp.models.*",),
+            )
+        )
+        self.children.append(
             modules.LinkList(
                 _("Backup"),
                 layout="inline",
                 column=1,
                 children=(
                     {
-                        "title": "Backup",
+                        "title": "Backup database",
+                        "url": reverse("backup_dump"),
+                        "external": True,
+                    },
+                    {
+                        "title": "Backup images",
                         "url": reverse("backup_view"),
                         "external": True,
-                        "target": "_blank",
                     },
                 ),
             )
         )
+
         # self.children.append(
         #     modules.AppList(
         #         _("Applications"),

@@ -6,6 +6,7 @@ from attribute.models import (
     AssignedProductAttribute,
     AssignedProductAttributeValue,
 )
+from import_export.admin import ImportExportModelAdmin
 
 
 class AttributeValueInline(admin.StackedInline):
@@ -13,7 +14,7 @@ class AttributeValueInline(admin.StackedInline):
     readonly_fields = ["slug", "value"]
 
 
-class AttributeAdmin(admin.ModelAdmin):
+class AttributeAdmin(ImportExportModelAdmin):
     model = Attribute
     fields = [
         "name",
@@ -68,7 +69,7 @@ class AttributeAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Attribute, AttributeAdmin)
-
-admin.site.register(AssignedProductAttribute)
-admin.site.register(AttributeProduct)
-admin.site.register(AssignedProductAttributeValue)
+admin.site.register(AttributeValue, ImportExportModelAdmin)
+admin.site.register(AssignedProductAttribute, ImportExportModelAdmin)
+admin.site.register(AttributeProduct, ImportExportModelAdmin)
+admin.site.register(AssignedProductAttributeValue, ImportExportModelAdmin)

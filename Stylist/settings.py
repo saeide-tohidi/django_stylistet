@@ -31,6 +31,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.postgres",
+    "import_export",
     "rest_framework",
     "rest_framework.authtoken",
     "drf_yasg",
@@ -45,6 +47,7 @@ INSTALLED_APPS = [
     "account.apps.AccountConfig",
     "product.apps.ProductConfig",
     "attribute.apps.AttributeConfig",
+    "backupp.apps.BackuppConfig",
 ]
 
 MIDDLEWARE = [

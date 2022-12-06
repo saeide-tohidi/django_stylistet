@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from import_export.admin import ImportExportModelAdmin
+
 from account.models import User, UserProfile
 from rest_framework.authtoken.models import Token
 
@@ -12,7 +14,7 @@ class TokenInline(admin.StackedInline):
     model = Token
 
 
-class CustomUserAdmin(UserAdmin):
+class CustomUserAdmin(UserAdmin, ImportExportModelAdmin):
     model = User
 
     list_display = ("email", "username", "is_staff", "get_token")
