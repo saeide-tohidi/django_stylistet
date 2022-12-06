@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "imagekit",
     "enmerkar",
     "django_prices",
+    "dbbackup_ui",
     "dashboard.apps.DashboardConfig",
     "account.apps.AccountConfig",
     "product.apps.ProductConfig",

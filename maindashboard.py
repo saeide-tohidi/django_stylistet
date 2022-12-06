@@ -64,6 +64,21 @@ class CustomIndexDashboard(Dashboard):
                 models=("django.contrib.auth.models.*",),
             )
         )
+        self.children.append(
+            modules.LinkList(
+                _("Backup"),
+                layout="inline",
+                column=1,
+                children=(
+                    {
+                        "title": "Backup",
+                        "url": reverse("backup_view"),
+                        "external": True,
+                        "target": "_blank",
+                    },
+                ),
+            )
+        )
         # self.children.append(
         #     modules.AppList(
         #         _("Applications"),

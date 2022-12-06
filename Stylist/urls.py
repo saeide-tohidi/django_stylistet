@@ -22,6 +22,7 @@ schema_view = get_schema_view(
 
 
 urlpatterns = [
+    path("admin/backups/", include("dbbackup_ui.urls")),
     path("grappelli/", include("grappelli.urls")),
     path("admin/dashboard/", include("dashboard.urls")),
     path("admin/", admin.site.urls),

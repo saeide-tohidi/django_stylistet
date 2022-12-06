@@ -4,11 +4,18 @@ from django.utils.text import slugify
 from mptt.managers import TreeManager
 from mptt.models import MPTTModel, TreeForeignKey
 from django.utils.translation import gettext_lazy as _
-
-from attribute.models import unique_slugify
 from seo.models import SeoModel
 from django_prices.models import MoneyField
 from babel.numbers import list_currencies
+from django.utils.crypto import get_random_string
+
+
+def unique_slugify(instance, slug):
+    model = instance.__class__
+    unique_slug = slugify(slug)
+    while model.objects.filter(slug=unique_slug).exists():
+        unique_slug = slug + "-" + get_random_string(length=4)
+    return unique_slug
 
 
 def create_currency():
