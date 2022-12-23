@@ -81,7 +81,7 @@ class Attribute(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        if not self.name:
+        if not self.slug:
             lower_name = self.name.lower()
             self.slug = unique_slugify(self, lower_name)
         super(Attribute, self).save(*args, **kwargs)
