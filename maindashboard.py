@@ -57,6 +57,13 @@ class CustomIndexDashboard(Dashboard):
                 ),
             )
         )
+        self.children.append(
+            modules.ModelList(
+                title="Collection",
+                column=1,
+                models=("collection.models.*",),
+            )
+        )
 
         self.children.append(
             modules.ModelList(

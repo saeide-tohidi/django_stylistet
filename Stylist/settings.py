@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "product.apps.ProductConfig",
     "attribute.apps.AttributeConfig",
     "backupp.apps.BackuppConfig",
+    "collection.apps.CollectionConfig",
 ]
 
 MIDDLEWARE = [
