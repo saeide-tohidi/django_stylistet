@@ -1,5 +1,4 @@
 from django.db import models
-
 from django.utils.text import slugify
 import pathlib
 from product.models import ProductType, Product
@@ -16,8 +15,6 @@ def unique_slugify(instance, slug):
 
 
 class AttributeInputType:
-    """The type that we expect to render the attribute's values as."""
-
     DROPDOWN = "oneselect"
     MULTISELECT = "multiselect"
     BOOLEAN = "boolean"
