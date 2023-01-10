@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.text import slugify
 import pathlib
+
+from attribute.models import AttributeProduct, AttributeValue
 from product.models import ProductType, Product
 from django.utils.crypto import get_random_string
 from seo.models import SeoModel
@@ -186,6 +188,56 @@ class AssignedCollectionAttributeValue(models.Model):
 
     def get_ordering_queryset(self):
         return self.assignment.collectionattrvalueassignment.all()
+
+    def __str__(self):
+        return str(self.value)
+
+
+class Item(models.Model):
+    collection = models.ForeignKey(
+        "Collection", related_name="items", on_delete=models.CASCADE
+    )
+    product_type = models.ForeignKey(
+        ProductType, related_name="product_type_items", on_delete=models.CASCADE
+    )
+
+
+class AssignedItemAttribute(BaseAssignedAttribute):
+    """Associate a product type attribute and selected values to a given product."""
+
+    item = models.ForeignKey(Item, related_name="attributes", on_delete=models.CASCADE)
+    assignment = models.ForeignKey(
+        AttributeProduct, on_delete=models.CASCADE, related_name="itemassignments"
+    )
+    values = models.ManyToManyField(
+        AttributeValue,
+        blank=True,
+        related_name="itemproductassignments",
+        through="AssignedItemAttributeValue",
+    )
+
+    class Meta:
+        unique_together = (("item", "assignment"),)
+
+
+class AssignedItemAttributeValue(models.Model):
+    value = models.ForeignKey(
+        AttributeValue,
+        on_delete=models.CASCADE,
+        related_name="itemvalueassignment",
+    )
+    assignment = models.ForeignKey(
+        AssignedItemAttribute,
+        on_delete=models.CASCADE,
+        related_name="itemvalueassignment",
+    )
+
+    class Meta:
+        unique_together = (("value", "assignment"),)
+        ordering = ("pk",)
+
+    def get_ordering_queryset(self):
+        return self.assignment.itemvalueassignment.all()
 
     def __str__(self):
         return str(self.value)

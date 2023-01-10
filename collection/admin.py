@@ -6,6 +6,9 @@ from collection.models import (
     CollectionAttributeValue,
     AssignedCollectionAttribute,
     AssignedCollectionAttributeValue,
+    AssignedItemAttribute,
+    AssignedItemAttributeValue,
+    Item,
 )
 
 
@@ -61,3 +64,6 @@ admin.site.register(CollectionAttribute, CollectionAttributeAdmin)
 admin.site.register(CollectionAttributeValue)
 admin.site.register(AssignedCollectionAttribute)
 admin.site.register(AssignedCollectionAttributeValue)
+admin.site.register(AssignedItemAttribute)
+admin.site.register(AssignedItemAttributeValue)
+admin.site.register(Item)
