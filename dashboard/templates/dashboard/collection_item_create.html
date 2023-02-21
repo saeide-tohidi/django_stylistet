@@ -1,0 +1,226 @@
+{% extends 'dashboard/shared/base.html' %}
+{% load static %}
+
+{% block header_ref %}
+
+
+    <link href="{% static 'admin_dashboard/plugins/global/plugins.bundle.css' %}" rel="stylesheet" type="text/css"/>
+    <script src="{% static 'admin_dashboard/plugins/global/plugins.bundle.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+    <!--begin::Content wrapper-->
+    <div class="d-flex flex-column flex-column-fluid">
+        <!--begin::Toolbar-->
+        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            <!--begin::Toolbar container-->
+            <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+                <!--begin::Page title-->
+                <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+                    <!--begin::Title-->
+                    <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">
+                        Item
+                        Form</h1> {{ collection }}
+                    <!--end::Title-->
+                </div>
+                <!--end::Page title-->
+            </div>
+            <!--end::Toolbar container-->
+        </div>
+        <!--end::Toolbar-->
+
+
+        <!--begin::Content-->
+        <div id="kt_app_content" class="app-content flex-column-fluid">
+            <!--begin::Content container-->
+            <div id="kt_app_content_container" class="app-container container-xxl">
+
+                <!--begin::Form-->
+                <form id="add_product" class="form d-flex flex-column flex-lg-row"
+                      method="POST"
+                      enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <!--begin::Aside column-->
+                    <div class="d-flex flex-column gap-7 gap-lg-10 w-100 w-lg-300px mb-7 me-lg-10">
+                        <!--begin::Product type-->
+                        <div class="card card-flush py-4">
+                            <div class="card-header">
+                                <div class="card-title required">
+                                    <h2>Item type</h2>
+                                </div>
+                            </div>
+                            <div class="card-body pt-0">
+                                <select class="form-select mb-2" data-control="select2" data-hide-search="true"
+                                        name="product_type" required
+                                        data-placeholder="Select an option" id="product_type">
+                                    <option></option>
+                                    {% for type in product_type %}
+                                        <option value="{{ type.id }}">{{ type.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="text-muted fs-7">You should choose product type to see other product
+                                    attributes.
+                                </div>
+                            </div>
+                        </div>
+                        <!--end::Product type-->
+                    </div>
+                    <!--end::Aside column-->
+
+                    <!--begin::Main column-->
+                    <div class="d-flex flex-column flex-row-fluid gap-7 gap-lg-10">
+
+                        <!--begin::Tab content-->
+                        <div class="tab-content">
+                            <!--begin::Tab pane-->
+                            <div class="tab-pane fade show active" id="kt_ecommerce_add_product_general"
+                                 role="tab-panel">
+                                <div class="d-flex flex-column gap-7 gap-lg-10">
+    <!--begin::General options-->
+                                    <div class="card card-flush py-4">
+                                        <div class="card-header">
+                                            <div class="card-title">
+                                                <h2>General info</h2>
+                                            </div>
+                                        </div>
+                                        <!--begin::Card body-->
+                                        <div class="card-body pt-0">
+                                            <div class="mb-10 fv-row">
+                                                <label class="required form-label">Name</label>
+                                                <input type="text" name="name" class="form-control mb-2"
+                                                       placeholder="Product name" value="" required/>
+                                            </div>
+                                        </div>
+                                        <!--end::Card header-->
+                                    </div>
+                                    <!--end::General options-->
+                                    <!--begin::Attributes-->
+                                    <div class="card card-flush py-4">
+                                        <!--begin::Card header-->
+                                        <div class="card-header">
+                                            <div class="card-title">
+                                                <h2>Attributes</h2>
+                                            </div>
+                                        </div>
+                                        <!--end::Card header-->
+
+
+                                        <!--begin::attributes-->
+                                        <div id="attributes">
+                                        </div>
+                                        <!--end::attributes-->
+
+                                    </div>
+                                    <!--end::Attributes-->
+
+                                </div>
+                            </div>
+                            <!--end::Tab pane-->
+
+                        </div>
+                        <!--end::Tab content-->
+                        <div class="d-flex justify-content-end">
+                             <input class="form-check-input" hidden type="text"
+                               name="collection"
+                               value="{{ collection }}"/>
+                            <!--begin::Button-->
+                            <a href="#" id="kt_ecommerce_add_product_cancel"
+                               class="btn btn-light me-5">Cancel</a>
+                            <!--end::Button-->
+                            <!--begin::Button-->
+                            <button type="submit" id="kt_ecommerce_add_product_submit" class="btn btn-primary">
+                                <span class="indicator-label">Save Changes</span>
+                                <span class="indicator-progress">Please wait...
+													<span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+                            </button>
+                            <!--end::Button-->
+                        </div>
+                    </div>
+                    <!--end::Main column-->
+                </form>
+                <!--end::Form-->
+            </div>
+            <!--end::Content container-->
+        </div>
+        <!--end::Content-->
+    </div>
+    <!--end::Content wrapper-->
+
+{% endblock %}
+
+
+
+{% block footer_ref %}
+    <!--begin::Vendors Javascript(used by this page)-->
+    <script src="{% static 'admin_dashboard/plugins/custom/datatables/datatables.bundle.js' %}"></script>
+    <script src="{% static 'admin_dashboard/plugins/custom/formrepeater/formrepeater.bundle.js' %}"></script>
+
+    <!--end::Vendors Javascript-->
+    <!--begin::Custom Javascript(used by this page)-->
+    <script src="{% static 'admin_dashboard/js/custom/apps/ecommerce/catalog/save-product.js' %}"></script>
+    <script src="{% static 'admin_dashboard/js/widgets.bundle.js' %}"></script>
+    <script src="{% static 'admin_dashboard/js/custom/widgets.js' %}"></script>
+    <script src="{% static 'admin_dashboard/js/custom/utilities/modals/upgrade-plan.js' %}"></script>
+    <script src="{% static 'admin_dashboard/js/custom/utilities/modals/create-app.js' %}"></script>
+    <script src="{% static 'admin_dashboard/js/custom/utilities/modals/users-search.js' %}"></script>
+    <!--end::Custom Javascript-->
+    <script>
+
+        $("#product_type").change(function () {
+            var url = '{% url 'ajax_load_product_type_attr_input' %}';
+            var product_type_id = $(this).val();
+
+            $.ajax({
+                url: url,
+                data: {
+                    'product_type_id': product_type_id
+                },
+                success: function (data) {
+                    $("#attributes").html(data);
+
+                }
+
+            });
+
+        });
+
+    </script>
+
+    <script>
+        $('#kt_docs_repeater_basic').repeater({
+            initEmpty: false,
+
+            defaultValues: {
+                'text-input': 'foo'
+            },
+
+            show: function () {
+                $(this).slideDown();
+            },
+
+            hide: function (deleteElement) {
+                $(this).slideUp(deleteElement);
+            }
+        });
+    </script>
+
+
+    <script>
+        var quill = new Quill('#kt_docs_quill_basic', {
+            modules: {
+                toolbar: true
+            },
+            placeholder: 'Type your text here...',
+            theme: 'snow'
+        });
+
+
+        $("#add_product").on("submit", function () {
+            $("#hiddenArea").val($(".ql-editor ").html());
+        })
+    </script>
+
+
+
+{% endblock %}

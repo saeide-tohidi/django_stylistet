@@ -58,6 +58,10 @@ class Collection(SeoModel):
 
         super(Collection, self).save(*args, **kwargs)
 
+    @property
+    def get_items(self):
+        return self.items.all()
+
 
 class CollectionAttribute(models.Model):
     slug = models.SlugField(max_length=250, unique=True, allow_unicode=True, blank=True)
@@ -202,12 +206,31 @@ class AssignedCollectionAttributeValue(models.Model):
 
 
 class Item(models.Model):
+    name = models.CharField(max_length=250, null=True)
     collection = models.ForeignKey(
         "Collection", related_name="items", on_delete=models.CASCADE
     )
     product_type = models.ForeignKey(
         ProductType, related_name="product_type_items", on_delete=models.CASCADE
     )
+
+    @property
+    def get_attr_values(self):
+        attributes = self.attributes.all()
+        all_attr_val = []
+        all_attr_val_str = ""
+
+        for attr in attributes:
+            values = []
+            values_str = ""
+            for at in attr.itemvalueassignment.all():
+                values.append([at.value.name])
+                values_str = f"{values_str} {at.value.name},"
+            t = f"{attr.assignment.attribute.name}: {values_str} "
+            all_attr_val.append(t)
+            all_attr_val_str = f"{all_attr_val_str}{t} _ "
+
+        return all_attr_val
 
 
 class AssignedItemAttribute(BaseAssignedAttribute):

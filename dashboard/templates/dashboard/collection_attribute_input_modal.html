@@ -1,0 +1,124 @@
+{% load static %}
+{% include 'dashboard/shared/_HeaderRef.html' %}
+
+{% for attr in booleans %}
+
+    <div class="mb-10">
+        <div class="mb-1 fv-row">
+            <label class="form-label">{{ attr.name }}</label>
+        </div>
+        <div class="form-check form-switch form-check-custom form-check-solid">
+            {% for val in attr.values.all %}
+                {% if val.boolean == True %}
+                    <input class="form-check-input" type="checkbox"
+                           name="{{ attr.slug }}" value="{{ val.id }}"
+                           id="{{ attr.name }}"
+                            {% if val.id in all_values %}
+                           checked {% endif %}/>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+{% endfor %}
+
+{% for attr in oneselect_no_pic %}
+
+    <div class="mb-10 fv-row">
+        <label class="form-label {% if attr.value_required %} required {% endif %}">{{ attr.name }}</label>
+        <select class="form-select mb-2" data-control="select2"
+                data-hide-search="true"
+                name="{{ attr.slug }}" {% if attr.value_required %}
+                required {% endif %}
+                data-placeholder="Select an option"
+                id="{{ attr.name }}">
+            <option></option>
+            {% for val in attr.values.all %}
+                <option value="{{ val.id }}"
+                        {% if val.id in all_values %}
+                        selected {% endif %}>{{ val.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+{% endfor %}
+
+{% for attr in multiselect_no_pic %}
+
+    <div class="mb-10">
+        <div class="mb-1 fv-row">
+            <label class="{% if attr.value_required %} required {% endif %} form-label">{{ attr.name }}</label>
+        </div>
+        {% for val in attr.values.all %}
+            <div class="form-check form-check-inline ">
+                <input class="form-check-input" type="checkbox"
+                       name="{{ attr.slug }}" value="{{ val.id }}"
+                       id="{{ attr.name }}"
+                        {% if val.id in all_values %}
+                       checked {% endif %}/>
+                <label class="form-check-label" for="{{ attr.name }}">
+                    {{ val.name }}
+                </label>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endfor %}
+
+{% for attr in oneselect_with_pic %}
+
+    <div class="row mw-500px mb-5" data-kt-buttons="true"
+         data-kt-buttons-target=".form-check-image, .form-check-input">
+        <label class="{% if attr.value_required %} required {% endif %} form-label">{{ attr.name }}</label>
+
+        {% for val in attr.values.all %}
+            <div class="col-4">
+                <label class="form-check-clip text-center {% if attr.value_required %} required {% endif %}">
+                    <input class="btn-check" type="radio"
+                           value="{{ val.id }}" name="{{ attr.slug }}"
+                            {% if val.id in all_values %}
+                           checked {% endif %}/>
+                    <div class="form-check-wrapper">
+                        <div class="form-check-indicator"></div>
+                        <img class="form-check-content w-150px h-150px"
+                             src="{{ val.picture.url }}"/>
+                    </div>
+                    <div class="form-check-label">
+                        {{ val.name }}
+                    </div>
+                </label>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endfor %}
+
+{% for attr in multiselect_with_pic %}
+
+    <div class="row mw-500px mb-5">
+        <label class="{% if attr.value_required %} required {% endif %} form-label">{{ attr.name }}</label>
+        {% for val in attr.values.all %}
+            <!--begin::Col-->
+            <div class="col-4">
+                <label class="form-check-clip text-center">
+                    <input class="btn-check" type="checkbox"
+                           value="{{ val.id }}" name="{{ attr.slug }}"
+                            {% if val.id in all_values %}
+                           checked {% endif %}/>
+                    <div class="form-check-wrapper">
+                        <div class="form-check-indicator"></div>
+                        <img class="form-check-content w-150px h-150px"
+                             src="{{ val.picture.url }}"/>
+                    </div>
+
+                    <div class="form-check-label">
+                        {{ val.name }}
+                    </div>
+                </label>
+            </div>
+            <!--end::Col-->
+        {% endfor %}
+
+    </div>
+
+{% endfor %}

@@ -9,6 +9,9 @@ from collection.models import (
     AssignedCollectionAttribute,
     AssignedCollectionAttributeValue,
     CollectionAttributeValue,
+    Item,
+    AssignedItemAttribute,
+    AssignedItemAttributeValue,
 )
 from product.models import Product, ProductType, ProductCategory, create_currency
 from django.db import transaction
@@ -514,6 +517,8 @@ class CollectionDetail(StaffuserRequiredMixin, SuccessMessageMixin, DetailView):
             assignment__collection=self.object
         ).values_list("value_id", flat=True)
 
+        context["product_type"] = ProductType.objects.all()
+
         return context
 
 
@@ -617,3 +622,71 @@ class CollectionUpdate(StaffuserRequiredMixin, SuccessMessageMixin, UpdateView):
                         at.delete()
 
         return super().form_valid(form)
+
+
+class ItemCreate(StaffuserRequiredMixin, SuccessMessageMixin, CreateView):
+    model = Item
+    fields = [
+        "name",
+        "collection",
+        "product_type",
+    ]
+    template_name = "dashboard/collection_item_create.html"
+    success_url = reverse_lazy("product_list")
+    success_message = "Your product create successfully"
+
+    def form_valid(self, form):
+        with transaction.atomic():
+            self.object = form.save(commit=False)
+            product_type = self.request.POST.get("product_type")
+            attributes = AttributeProduct.objects.filter(product_type_id=product_type)
+            self.object.save()
+            self.success_url = reverse_lazy(
+                "collection_detail", kwargs={"pk": self.object.collection.pk}
+            )
+            for attr in attributes:
+                if self.request.POST.get(attr.attribute.slug):
+                    attr_values = self.request.POST.get(attr.attribute.slug)
+                    if attr.attribute.input_type == "oneselect":
+                        value = AttributeValue.objects.filter(id=attr_values).first()
+                        attr_product = AssignedItemAttribute()
+                        attr_product.item = self.object
+                        attr_product.assignment = attr
+                        attr_product.save()
+                        attr_product_value = AssignedItemAttributeValue()
+                        attr_product_value.assignment = attr_product
+                        attr_product_value.value = value
+                        attr_product_value.save()
+
+                    if attr.attribute.input_type == "multiselect":
+                        attr_values = self.request.POST.getlist(attr.attribute.slug)
+                        attr_product = AssignedItemAttribute()
+                        attr_product.item = self.object
+                        attr_product.assignment = attr
+                        attr_product.save()
+                        for val in attr_values:
+                            val = AttributeValue.objects.filter(id=val).first()
+                            attr_product_value = AssignedItemAttributeValue()
+                            attr_product_value.assignment = attr_product
+                            attr_product_value.value = val
+                            attr_product_value.save()
+
+                    if attr.attribute.input_type == "boolean":
+                        value = AttributeValue.objects.filter(id=attr_values).first()
+                        attr_product = AssignedItemAttribute()
+                        attr_product.item = self.object
+                        attr_product.assignment = attr
+                        attr_product.save()
+                        attr_product_value = AssignedItemAttributeValue()
+                        attr_product_value.assignment = attr_product
+                        attr_product_value.value = value
+                        attr_product_value.save()
+
+            return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["collection"] = self.kwargs.get("pk")
+
+        context["product_type"] = ProductType.objects.all()
+        return context

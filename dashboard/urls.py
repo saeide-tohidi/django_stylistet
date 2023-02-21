@@ -9,6 +9,7 @@ from dashboard.views import (
     CollectionCreate,
     CollectionDetail,
     CollectionUpdate,
+    ItemCreate,
 )
 
 urlpatterns = [
@@ -48,5 +49,10 @@ urlpatterns = [
         "collection/edit/<int:pk>/",
         CollectionUpdate.as_view(),
         name="collection_edit",
+    ),
+    path(
+        "collection/<int:pk>/item/create/",
+        ItemCreate.as_view(),
+        name="item_create",
     ),
 ]
