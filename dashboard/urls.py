@@ -3,8 +3,12 @@ from dashboard.views import (
     ProductList,
     ProductCreate,
     load_product_type_attribute_input,
-    ProductEdit,
+    ProductUpdate,
     ProductDetail,
+    CollectionList,
+    CollectionCreate,
+    CollectionDetail,
+    CollectionUpdate,
 )
 
 urlpatterns = [
@@ -16,7 +20,7 @@ urlpatterns = [
     ),
     path(
         "product/edit/<int:pk>/",
-        ProductEdit.as_view(),
+        ProductUpdate.as_view(),
         name="product_edit",
     ),
     path(
@@ -28,5 +32,21 @@ urlpatterns = [
         "ajax/load_product_type_attr_input/",
         load_product_type_attribute_input,
         name="ajax_load_product_type_attr_input",
+    ),
+    path("collections/", CollectionList.as_view(), name="collection_list"),
+    path(
+        "collection/create/",
+        CollectionCreate.as_view(),
+        name="collection_create",
+    ),
+    path(
+        "collection/detail/<int:pk>/",
+        CollectionDetail.as_view(),
+        name="collection_detail",
+    ),
+    path(
+        "collection/edit/<int:pk>/",
+        CollectionUpdate.as_view(),
+        name="collection_edit",
     ),
 ]

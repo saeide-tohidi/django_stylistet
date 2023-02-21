@@ -13,7 +13,7 @@
                 <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
                     <!--begin::Title-->
                     <h1 class="page-heading d-flex text-dark fw-bold fs-3 flex-column justify-content-center my-0">
-                        Products</h1>
+                        Collections</h1>
                     <!--end::Title-->
                 </div>
                 <!--end::Page title-->
@@ -37,7 +37,7 @@
                         <!--begin::Card toolbar-->
                         <div class="card-toolbar flex-row-fluid justify-content-end gap-5">
                             <!--begin::Add product-->
-                            <a href="{% url 'product_create' %}" class="btn btn-primary">Add Product</a>
+                            <a href="{% url 'collection_create' %}" class="btn btn-primary">Add Collection</a>
                             <!--end::Add product-->
                         </div>
                         <!--end::Card toolbar-->
@@ -52,7 +52,7 @@
                             <thead>
                             <!--begin::Table row-->
                             <tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
-                                <th class="min-w-200px">Product</th>
+                                <th class="min-w-200px">Collection</th>
                                 <th class="text-start min-w-70px">category</th>
                                 <th class="text-start min-w-70px">Type</th>
                                 <th class="text-start min-w-70px">Attribute</th>
@@ -63,37 +63,36 @@
                             <!--end::Table head-->
                             <!--begin::Table body-->
                             <tbody class="fw-semibold text-gray-600">
-                            {% for product in products %}
+                            {% for collection in collections %}
                                 <!--begin::Table row-->
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <a href="#" class="symbol symbol-50px">
                                                             <span class="symbol-label"
-                                                                  style="background-image:url({{ product.main_image.url }});"></span>
+                                                                  style="background-image:url({{ collection.main_image.url }});"></span>
                                             </a>
                                             <div class="ms-5">
-                                                <a href="{% url 'product_detail' pk=product.pk %}"
+                                                <a href="{% url 'collection_detail' pk=collection.pk %}"
                                                    class="text-gray-800 text-hover-primary fs-5 fw-bold"
-                                                   data-kt-ecommerce-product-filter="product_name">{{ product.name }}</a>
+                                                   data-kt-ecommerce-product-filter="product_name">{{ collection.name }}</a>
                                             </div>
                                         </div>
                                     </td>
 
                                     <td class="text-start pe-0">
-                                        <span class="fw-bold">{{ product.product_category.name }}</span>
+                                        <span class="fw-bold"></span>
                                     </td>
 
                                     <td class="text-start pe-0">
-                                        <span class="fw-bold">{{ product.product_type.name }}</span>
+                                        <span class="fw-bold"></span>
                                     </td>
 
                                     <td class="text-start ms-5">
-                                        {% for val in product.get_attr_values %}
-                                            <span class="fw-bold text-right">{{ val }}</span>
-                                            <br>
 
-                                        {% endfor %}
+                                        <span class="fw-bold text-right"></span>
+                                        <br>
+
                                     </td>
 
 
@@ -116,7 +115,7 @@
                                              data-kt-menu="true">
                                             <!--begin::Menu item-->
                                             <div class="menu-item px-3">
-                                                <a href="{% url 'product_detail' pk=product.pk %}"
+                                                <a href="{% url 'product_detail' pk=collection.pk %}"
                                                    class="menu-link px-3">Edit</a>
                                             </div>
                                             <!--end::Menu item-->

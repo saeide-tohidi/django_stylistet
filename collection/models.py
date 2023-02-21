@@ -46,10 +46,17 @@ class Collection(SeoModel):
 
     class Meta:
         app_label = "collection"
-        ordering = ("slug",)
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        lower_name = self.name.lower()
+
+        if not self.slug:
+            self.slug = unique_slugify(self, lower_name)
+
+        super(Collection, self).save(*args, **kwargs)
 
 
 class CollectionAttribute(models.Model):
@@ -89,13 +96,14 @@ class BaseAssignedAttribute(models.Model):
     class Meta:
         abstract = True
 
-    @property
-    def attribute(self):
-        return self.assignment.attribute
-
-    @property
-    def attribute_pk(self):
-        return self.assignment.attribute_id
+    #
+    # @property
+    # def attribute(self):
+    #     return self.assignment.id
+    #
+    # @property
+    # def attribute_pk(self):
+    #     return self.assignment.attribute_id
 
 
 class CollectionAttributeValue(models.Model):

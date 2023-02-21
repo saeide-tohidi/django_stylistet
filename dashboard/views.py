@@ -2,6 +2,14 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, UpdateView, CreateView, DetailView
+
+from collection.models import (
+    Collection,
+    CollectionAttribute,
+    AssignedCollectionAttribute,
+    AssignedCollectionAttributeValue,
+    CollectionAttributeValue,
+)
 from product.models import Product, ProductType, ProductCategory, create_currency
 from django.db import transaction
 from braces.views import StaffuserRequiredMixin
@@ -30,7 +38,7 @@ class ProductList(StaffuserRequiredMixin, ListView):
 
 
 class ProductDetail(StaffuserRequiredMixin, SuccessMessageMixin, DetailView):
-    template_name = "dashboard/product_edit.html"
+    template_name = "dashboard/product_detail.html"
     model = Product
     context_object_name = "product"
     pk_url_kwarg = "pk"
@@ -144,7 +152,7 @@ class ProductCreate(StaffuserRequiredMixin, SuccessMessageMixin, CreateView):
         return context
 
 
-class ProductEdit(StaffuserRequiredMixin, SuccessMessageMixin, UpdateView):
+class ProductUpdate(StaffuserRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Product
     fields = [
         "product_category",
@@ -155,7 +163,7 @@ class ProductEdit(StaffuserRequiredMixin, SuccessMessageMixin, UpdateView):
         "currency",
         "shopping_url",
     ]
-    template_name = "dashboard/product_edit.html"
+    template_name = "dashboard/product_detail.html"
     success_url = reverse_lazy("product_list")
     success_message = "Your product updated successfully"
     pk_url_kwarg = "pk"
@@ -365,3 +373,247 @@ def load_product_type_attribute_input(request):
             "all_values": all_values,
         }
         return render(request, "dashboard/attribute_input.html", context)
+
+
+class CollectionList(StaffuserRequiredMixin, ListView):
+    model = Collection
+    template_name = "dashboard/collection_list.html"
+    context_object_name = "collections"
+
+    def get_queryset(self):
+        qs = Collection.objects.all().order_by("-id")
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+class CollectionCreate(StaffuserRequiredMixin, SuccessMessageMixin, CreateView):
+    model = Collection
+    fields = [
+        "name",
+        "main_image",
+        "description",
+    ]
+    template_name = "dashboard/collection_create.html"
+    success_url = reverse_lazy("collection_list")
+    success_message = "Your collection created successfully"
+
+    def form_valid(self, form):
+        test = self.request.POST
+        print(test)
+        with transaction.atomic():
+
+            self.object = form.save(commit=False)
+            attributes = CollectionAttribute.objects.all()
+            self.object.save()
+            self.success_url = reverse_lazy(
+                "product_detail", kwargs={"pk": self.object.pk}
+            )
+            for attr in attributes:
+                print(attr)
+                if self.request.POST.get(attr.slug):
+                    attr_values = self.request.POST.get(attr.slug)
+                    if attr.input_type == "oneselect":
+                        value = CollectionAttributeValue.objects.filter(
+                            id=attr_values
+                        ).first()
+                        attr_product = AssignedCollectionAttribute()
+                        attr_product.collection = self.object
+                        attr_product.attribute = attr
+                        attr_product.save()
+                        attr_product_value = AssignedCollectionAttributeValue()
+                        attr_product_value.assignment = attr_product
+                        attr_product_value.value = value
+                        attr_product_value.save()
+
+                    if attr.input_type == "multiselect":
+                        attr_values = self.request.POST.getlist(attr.slug)
+                        attr_product = AssignedCollectionAttribute()
+                        attr_product.collection = self.object
+                        attr_product.attribute = attr
+                        attr_product.save()
+                        for val in attr_values:
+                            val = CollectionAttributeValue.objects.filter(
+                                id=val
+                            ).first()
+                            attr_product_value = AssignedCollectionAttributeValue()
+                            attr_product_value.assignment = attr_product
+                            attr_product_value.value = val
+                            attr_product_value.save()
+
+                    if attr.input_type == "boolean":
+                        value = CollectionAttributeValue.objects.filter(
+                            id=attr_values
+                        ).first()
+                        attr_product = AssignedCollectionAttribute()
+                        attr_product.product = self.object
+                        attr_product.attribute = attr
+                        attr_product.save()
+                        attr_product_value = AssignedCollectionAttributeValue()
+                        attr_product_value.assignment = attr_product
+                        attr_product_value.value = value
+                        attr_product_value.save()
+
+            return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        attributes = CollectionAttribute.objects.all()
+        booleans = attributes.filter(input_type="boolean")
+        oneselect_with_pic = attributes.filter(input_type="oneselect", image_value=True)
+        oneselect_no_pic = attributes.filter(input_type="oneselect", image_value=False)
+        multiselect_with_pic = attributes.filter(
+            input_type="multiselect", image_value=True
+        )
+        multiselect_no_pic = attributes.filter(
+            input_type="multiselect", image_value=False
+        )
+        context["booleans"] = booleans
+        context["oneselect_with_pic"] = oneselect_with_pic
+        context["oneselect_no_pic"] = oneselect_no_pic
+        context["multiselect_with_pic"] = multiselect_with_pic
+        context["multiselect_no_pic"] = multiselect_no_pic
+
+        return context
+
+
+class CollectionDetail(StaffuserRequiredMixin, SuccessMessageMixin, DetailView):
+    template_name = "dashboard/collection_detail.html"
+    model = Collection
+    context_object_name = "collection"
+    pk_url_kwarg = "pk"
+    query_pk_and_slug = True
+
+    def get_queryset(self):
+        return Collection.objects.filter()
+
+    def get(self, request, pk):
+        return super().get(request)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        collection = self.object
+        attributes = CollectionAttribute.objects.all()
+        booleans = attributes.filter(input_type="boolean")
+        oneselect_with_pic = attributes.filter(input_type="oneselect", image_value=True)
+        oneselect_no_pic = attributes.filter(input_type="oneselect", image_value=False)
+        multiselect_with_pic = attributes.filter(
+            input_type="multiselect", image_value=True
+        )
+        multiselect_no_pic = attributes.filter(
+            input_type="multiselect", image_value=False
+        )
+        context["booleans"] = booleans
+        context["oneselect_with_pic"] = oneselect_with_pic
+        context["oneselect_no_pic"] = oneselect_no_pic
+        context["multiselect_with_pic"] = multiselect_with_pic
+        context["multiselect_no_pic"] = multiselect_no_pic
+        context["all_values"] = AssignedCollectionAttributeValue.objects.filter(
+            assignment__collection=self.object
+        ).values_list("value_id", flat=True)
+
+        return context
+
+
+class CollectionUpdate(StaffuserRequiredMixin, SuccessMessageMixin, UpdateView):
+    model = Collection
+    fields = [
+        "name",
+        "main_image",
+        "description",
+    ]
+    template_name = "dashboard/collection_detail.html"
+    success_url = reverse_lazy("collection_detail")
+    success_message = "Your collection updated successfully"
+    pk_url_kwarg = "pk"
+    query_pk_and_slug = True
+
+    def get_queryset(self):
+        return Collection.objects.filter()
+
+    def form_valid(self, form):
+        self.success_url = reverse_lazy(
+            "collection_detail", kwargs={"pk": self.object.pk}
+        )
+        with transaction.atomic():
+            self.object = form.save(commit=False)
+            attributes = CollectionAttribute.objects.all()
+            for attr in attributes:
+                if self.request.POST.get(attr.slug):
+                    attr_values = self.request.POST.get(attr.slug)
+                    if attr.input_type == "oneselect":
+                        value = CollectionAttributeValue.objects.filter(
+                            id=attr_values
+                        ).first()
+                        (
+                            attr_product,
+                            create,
+                        ) = AssignedCollectionAttribute.objects.get_or_create(
+                            collection=self.object, attribute=attr
+                        )
+                        (
+                            attr_product_value,
+                            create,
+                        ) = AssignedCollectionAttributeValue.objects.get_or_create(
+                            assignment=attr_product, value=value
+                        )
+                        previous_values = (
+                            AssignedCollectionAttributeValue.objects.filter(
+                                assignment=attr_product
+                            ).exclude(id=attr_product_value.id)
+                        )
+                        for val in previous_values:
+                            val.delete()
+
+                    if attr.input_type == "multiselect":
+                        attr_values = self.request.POST.getlist(attr.slug)
+                        (
+                            attr_product,
+                            create,
+                        ) = AssignedCollectionAttribute.objects.get_or_create(
+                            collection=self.object, attribute=attr
+                        )
+                        previous_values = (
+                            AssignedCollectionAttributeValue.objects.filter(
+                                assignment=attr_product
+                            )
+                        )
+                        for val in attr_values:
+                            val = CollectionAttributeValue.objects.filter(
+                                id=val
+                            ).first()
+                            (
+                                attr_product_value,
+                                create,
+                            ) = AssignedCollectionAttributeValue.objects.get_or_create(
+                                assignment=attr_product, value=val
+                            )
+                            previous_values = previous_values.exclude(
+                                id=attr_product_value.id
+                            )
+                        for val in previous_values:
+                            val.delete()
+
+                    if attr.input_type == "boolean":
+                        value = CollectionAttributeValue.objects.filter(
+                            id=attr_values
+                        ).first()
+                        (
+                            attr_product,
+                            create,
+                        ) = AssignedCollectionAttribute.objects.get_or_create(
+                            collection=self.object, attribute=attr
+                        )
+                        AssignedCollectionAttributeValue.objects.get_or_create(
+                            assignment=attr_product, value=value
+                        )
+                else:
+                    attr_product = AssignedCollectionAttribute.objects.filter(
+                        collection=self.object, attribute=attr
+                    )
+                    for at in attr_product:
+                        at.delete()
+
+        return super().form_valid(form)
