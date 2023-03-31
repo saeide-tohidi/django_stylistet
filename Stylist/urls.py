@@ -36,6 +36,7 @@ urlpatterns = [
         name="schema-json",
     ),
     path("api/", include("account.api.urls")),
+    path("api/", include("collection.api.urls")),
 ]
 
 

@@ -1,8 +1,12 @@
+from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
-from django.shortcuts import render
+from django.db.models import Q
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import ListView, UpdateView, CreateView, DetailView
 
+from collection.filter import ItemProductsFilter
 from collection.models import (
     Collection,
     CollectionAttribute,
@@ -687,6 +691,157 @@ class ItemCreate(StaffuserRequiredMixin, SuccessMessageMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["collection"] = self.kwargs.get("pk")
-
         context["product_type"] = ProductType.objects.all()
         return context
+
+
+class ItemDetail(StaffuserRequiredMixin, SuccessMessageMixin, UpdateView):
+    template_name = "dashboard/collection_item_detail.html"
+    model = Item
+    context_object_name = "product"
+    pk_url_kwarg = "pk"
+    query_pk_and_slug = True
+    fields = [
+        "name",
+    ]
+
+    def get_queryset(self):
+        return Item.objects.filter()
+
+    def get(self, request, pk):
+        return super().get(request)
+
+    def form_valid(self, form):
+
+        with transaction.atomic():
+            self.object = form.save(commit=False)
+            self.success_url = reverse_lazy(
+                "item_detail", kwargs={"pk": self.object.pk}
+            )
+            attributes = AttributeProduct.objects.filter(
+                product_type=self.object.product_type
+            )
+
+            for attr in attributes:
+                if self.request.POST.get(attr.attribute.slug):
+                    attr_values = self.request.POST.get(attr.attribute.slug)
+                    if attr.attribute.input_type == "oneselect":
+                        value = AttributeValue.objects.filter(id=attr_values).first()
+                        (
+                            attr_product,
+                            create,
+                        ) = AssignedItemAttribute.objects.get_or_create(
+                            item=self.object, assignment=attr
+                        )
+                        (
+                            attr_product_value,
+                            create,
+                        ) = AssignedItemAttributeValue.objects.get_or_create(
+                            assignment=attr_product, value=value
+                        )
+                        previous_values = AssignedItemAttributeValue.objects.filter(
+                            assignment=attr_product
+                        ).exclude(id=attr_product_value.id)
+                        for val in previous_values:
+                            val.delete()
+
+                    if attr.attribute.input_type == "multiselect":
+                        attr_values = self.request.POST.getlist(attr.attribute.slug)
+                        (
+                            attr_product,
+                            create,
+                        ) = AssignedItemAttribute.objects.get_or_create(
+                            item=self.object, assignment=attr
+                        )
+                        previous_values = AssignedItemAttributeValue.objects.filter(
+                            assignment=attr_product
+                        )
+                        for val in attr_values:
+                            val = AttributeValue.objects.filter(id=val).first()
+                            (
+                                attr_product_value,
+                                create,
+                            ) = AssignedItemAttributeValue.objects.get_or_create(
+                                assignment=attr_product, value=val
+                            )
+                            previous_values = previous_values.exclude(
+                                id=attr_product_value.id
+                            )
+                        for val in previous_values:
+                            val.delete()
+
+                    if attr.attribute.input_type == "boolean":
+                        value = AttributeValue.objects.filter(id=attr_values).first()
+                        (
+                            attr_product,
+                            create,
+                        ) = AssignedItemAttribute.objects.get_or_create(
+                            item=self.object, assignment=attr
+                        )
+                        AssignedItemAttributeValue.objects.get_or_create(
+                            assignment=attr_product, value=value
+                        )
+                else:
+                    attr_product = AssignedItemAttribute.objects.filter(
+                        item=self.object, assignment=attr
+                    )
+                    for at in attr_product:
+                        at.delete()
+
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        item = self.object
+        attributes = Attribute.objects.filter(product_types=item.product_type.id)
+        booleans = attributes.filter(input_type="boolean")
+        oneselect_with_pic = attributes.filter(input_type="oneselect", image_value=True)
+        oneselect_no_pic = attributes.filter(input_type="oneselect", image_value=False)
+        multiselect_with_pic = attributes.filter(
+            input_type="multiselect", image_value=True
+        )
+        multiselect_no_pic = attributes.filter(
+            input_type="multiselect", image_value=False
+        )
+        context["booleans"] = booleans
+        context["oneselect_with_pic"] = oneselect_with_pic
+        context["oneselect_no_pic"] = oneselect_no_pic
+        context["multiselect_with_pic"] = multiselect_with_pic
+        context["multiselect_no_pic"] = multiselect_no_pic
+        context["product_type"] = ProductType.objects.all()
+        context["all_values"] = AssignedItemAttributeValue.objects.filter(
+            assignment__item=self.object
+        ).values_list("value_id", flat=True)
+
+        my_filter_qs = Q()
+        product = Product.objects.filter(product_type=item.product_type)
+
+        for creator in item.get_attr_values_filter_dict["values_num"]:
+            product = product.filter(
+                attributes__productvalueassignment__value__id=creator
+            )
+            print(product)
+        context["products"] = product.distinct()
+        return context
+
+
+class ItemDelete(View):
+    def get(self, request, pk, *args, **kwargs):
+        item = Item.objects.get(id=pk)
+        collection_pk = item.collection.pk
+        item.delete()
+        messages.success(self.request, "You delete that item successfully")
+        return redirect(
+            to=reverse_lazy("collection_detail", kwargs={"pk": collection_pk})
+        )
+
+
+class CollectionDelete(View):
+    def get(self, request, pk, *args, **kwargs):
+        collection = Collection.objects.get(pk=pk)
+        items = collection.items.all()
+        for item in items:
+            item.delete()
+        collection.delete()
+        messages.success(self.request, "You delete that collection successfully")
+        return redirect(to=reverse_lazy("collection_list"))

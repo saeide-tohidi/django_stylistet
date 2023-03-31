@@ -10,6 +10,9 @@ from dashboard.views import (
     CollectionDetail,
     CollectionUpdate,
     ItemCreate,
+    ItemDetail,
+    ItemDelete,
+    CollectionDelete,
 )
 
 urlpatterns = [
@@ -51,8 +54,23 @@ urlpatterns = [
         name="collection_edit",
     ),
     path(
+        "collection/delete/<int:pk>/",
+        CollectionDelete.as_view(),
+        name="collection_delete",
+    ),
+    path(
         "collection/<int:pk>/item/create/",
         ItemCreate.as_view(),
         name="item_create",
+    ),
+    path(
+        "collection/item/detail/<int:pk>/",
+        ItemDetail.as_view(),
+        name="item_detail",
+    ),
+    path(
+        "collection/item/delete/<int:pk>/",
+        ItemDelete.as_view(),
+        name="item_delete",
     ),
 ]

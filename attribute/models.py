@@ -191,7 +191,7 @@ class AssignedProductAttributeValue(models.Model):
     value = models.ForeignKey(
         AttributeValue,
         on_delete=models.CASCADE,
-        related_name="productvalueassignment",
+        related_name="productvalueassignmentvalue",
     )
     assignment = models.ForeignKey(
         AssignedProductAttribute,

@@ -232,6 +232,20 @@ class Item(models.Model):
 
         return all_attr_val
 
+    @property
+    def get_attr_values_filter_dict(self):
+        attributes = self.attributes.all()
+        all_attr_val_str = {}
+        values = []
+        val_num = []
+        for attr in attributes:
+            for at in attr.itemvalueassignment.all():
+                values.append(str(at.value.id))
+                val_num.append(at.value.id)
+        all_attr_val_str["values"] = values
+        all_attr_val_str["values_num"] = val_num
+        return all_attr_val_str
+
 
 class AssignedItemAttribute(BaseAssignedAttribute):
     """Associate a product type attribute and selected values to a given product."""
