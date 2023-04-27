@@ -502,6 +502,7 @@ class CollectionDetail(StaffuserRequiredMixin, SuccessMessageMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         collection = self.object
+        print(collection)
         attributes = CollectionAttribute.objects.all()
         booleans = attributes.filter(input_type="boolean")
         oneselect_with_pic = attributes.filter(input_type="oneselect", image_value=True)
@@ -812,8 +813,6 @@ class ItemDetail(StaffuserRequiredMixin, SuccessMessageMixin, UpdateView):
         context["all_values"] = AssignedItemAttributeValue.objects.filter(
             assignment__item=self.object
         ).values_list("value_id", flat=True)
-
-        my_filter_qs = Q()
         product = Product.objects.filter(product_type=item.product_type)
 
         for creator in item.get_attr_values_filter_dict["values_num"]:

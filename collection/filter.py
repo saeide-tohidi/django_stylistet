@@ -15,7 +15,7 @@ class CustomField(django_filters.fields.ModelMultipleChoiceField):
         if null:
             value = [v for v in value if v != self.null_value]
         field_name = self.to_field_name or "pk"
-        print(self.queryset)
+        print(self.queryset, field_name)
         print(value)
         result = list(self.queryset.filter(value__id__in=value).distinct())
         print(result)
