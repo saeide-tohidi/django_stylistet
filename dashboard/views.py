@@ -819,7 +819,6 @@ class ItemDetail(StaffuserRequiredMixin, SuccessMessageMixin, UpdateView):
             product = product.filter(
                 attributes__productvalueassignment__value__id=creator
             )
-            print(product)
         context["products"] = product.distinct()
         return context
 
