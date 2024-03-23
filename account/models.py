@@ -5,6 +5,8 @@ from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser, Group, Permission
 from django.contrib.auth.models import PermissionsMixin
 from .managers import UserManager
+import pytz
+from datetime import datetime
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -55,3 +57,108 @@ class UserProfile(models.Model):
         elif self.user.username:
             return self.user.username
         return self.user.email
+
+
+class UserBits(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("User"),
+        related_name="bits",
+        on_delete=models.CASCADE,
+    )
+    last_login = models.DateTimeField(_("Last login in app"), null=True, blank=True)
+
+    def __str__(self):
+        return str(self.user.email)
+
+    def record_last_login(self):
+        self.last_login_chat_room = datetime.now()
+        self.save()
+
+
+class UserConfig(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("User"),
+        related_name="config",
+        on_delete=models.CASCADE,
+    )
+
+    TIMEZONES = [(t, t) for t in pytz.all_timezones]
+    user_timezone = models.CharField(
+        _("Timezone"), choices=TIMEZONES, max_length=100, default="Canada/Central"
+    )
+    timezone_setted = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.user.email)
+
+    def save(self, *args, **kwargs):
+
+        super(UserConfig, self).save(*args, **kwargs)
+
+
+class UserPreference(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("User"),
+        related_name="preference",
+        on_delete=models.CASCADE,
+    )
+
+    def __str__(self):
+        return str(self.user.email)
+
+
+class UserPreferenceInstanceCollectionAttribute(models.Model):
+    user_preference = models.ForeignKey(
+        "account.UserPreference",
+        verbose_name=_("User"),
+        related_name="instance_collection_attribute",
+        on_delete=models.CASCADE,
+    )
+
+    ATTRIBUTE_COLLECTION = "collection"
+    ATTRIBUTE_PRODUCT = "product"
+    ATTRIBUTE_TYPES = (
+        (ATTRIBUTE_COLLECTION, "Collection"),
+        (ATTRIBUTE_PRODUCT, "Product"),
+    )
+    attribute = models.ForeignKey(
+        "collection.CollectionAttribute",
+        related_name="preference_collection",
+        on_delete=models.CASCADE,
+    )
+
+    values = models.ManyToManyField(
+        "collection.CollectionAttributeValue",
+        blank=True,
+        related_name="collectionattributeinstance",
+        through="UserPreferenceInstanceCollectionAttributeValue",
+    )
+
+    class Meta:
+        unique_together = (("user_preference", "attribute"),)
+
+    def __str__(self):
+        return str(self.user_preference)
+
+
+class UserPreferenceInstanceCollectionAttributeValue(models.Model):
+    value = models.ForeignKey(
+        "collection.CollectionAttributeValue",
+        on_delete=models.CASCADE,
+        related_name="collectionvalueassignment_user",
+    )
+    instance = models.ForeignKey(
+        "account.UserPreferenceInstanceCollectionAttribute",
+        on_delete=models.CASCADE,
+        related_name="collectionattrvalueassignment_user",
+    )
+
+    class Meta:
+        unique_together = (("value", "instance"),)
+        ordering = ("pk",)
+
+    def __str__(self):
+        return str(self.value)
